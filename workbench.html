@@ -20,8 +20,7 @@
     <div class="wrap">
       <h1 id="wb-title">What’s on your mind?</h1>
       <p class="lead" id="wb-lead">
-        Type like you would in any chat. We <strong>hold</strong> your words as a verifiable moment — not cloud memory, not a platform lock.
-        Deeper AI analysis is optional (local or PortAbleRI symbiote).
+        Type like you would in any chat. We <strong>hold</strong> your words in this thread first — no Finder pop, no cloud model unless you choose it later.
       </p>
     </div>
   </header>
@@ -67,7 +66,7 @@
             </label>
             <textarea id="present-moment" hidden aria-hidden="true"></textarea>
             <div class="actions">
-              <button type="button" class="btn btn-secondary" id="btn-cut-lasher">Re-download crystal (JSON)</button>
+              <button type="button" class="btn btn-secondary" id="btn-cut-lasher">Download moment file (JSON)</button>
               <button type="button" class="btn btn-secondary" id="btn-cut-md">Download markdown</button>
             </div>
             <pre class="wb-log" id="lasher-preview" hidden></pre>
@@ -95,7 +94,7 @@
   </main>
 
   <script type="module">
-    import { buildLasherRecordV0, downloadText, loadPariBrowser } from './js/nw-workbench.mjs';
+    import { buildLasherRecordV0, buildMomentExportText, downloadText, loadPariBrowser } from './js/nw-workbench.mjs';
     import { loadThread, saveThread, slugFromText } from './js/nw-composer-thread.mjs';
     import { markStep } from './js/nw-onboard-progress.mjs';
     import { consumeOpeningDraft } from './js/nw-opening.mjs';
@@ -116,8 +115,22 @@
     let state = { bootstrap: null, manifest: null, lastLasher: null, pendingFiles: [] };
     let messages = loadThread();
 
+    function syncComposerChrome() {
+      document.body.classList.toggle('composer-has-thread', messages.length > 0);
+    }
+
+    function downloadCrystalFile() {
+      if (!state.lastLasher) return;
+      const { filename, exportText, record, sha256 } = state.lastLasher;
+      const text =
+        exportText ??
+        buildMomentExportText({ record, sha256 });
+      downloadText(filename.replace(/\.json$/, '-nw.json'), text);
+    }
+
     function renderThread() {
       threadEl.querySelectorAll('.thread-msg').forEach((n) => n.remove());
+      syncComposerChrome();
       if (!messages.length) {
         threadEmpty.hidden = false;
         return;
@@ -139,13 +152,16 @@
 
     function holdResponse(record, sha256) {
       return (
-        `<strong>Held here on NNoWWoNN.</strong> Your exact words are sealed in this thread — not sent to a cloud model on this lane.<br>` +
-        `<span class="msg-meta">Crystal id: ${record.id} · sha256: <code>${sha256.slice(0, 16)}…</code> · JSON in your Downloads</span><br>` +
-        `Keep typing below — this is still your bench. Optional local AI and PortAbleRI paths live under <strong>Advanced ▾</strong> when you want them.`
+        `<strong>Held here on NNoWWoNN.</strong> Your exact words stay in this thread — not sent to a cloud model on this lane.<br>` +
+        `<span class="msg-meta">Moment id: ${record.id} · seal: <code>${sha256.slice(0, 16)}…</code></span><br>` +
+        `<button type="button" class="btn btn-secondary hold-save">Save one file (optional)</button><br>` +
+        `Keep typing below. Export, verify, and deeper tools are under <strong>Advanced ▾</strong> when you want them.`
       );
     }
 
-    async function captureMoment(text, attachments) {
+    /** @param {{ download?: boolean }} [opts] */
+    async function captureMoment(text, attachments, opts = {}) {
+      const { download = false } = opts;
       presentEl.value = text;
       const slug = slugEl.value.trim() || slugFromText(text);
       const { record, canonical, sha256, filename } = await buildLasherRecordV0({
@@ -156,12 +172,26 @@
         worldlineId: state.bootstrap?.worldline_id ?? null,
         shore: 'nnowwonn.com/workbench.html',
       });
-      state.lastLasher = { record, sha256, canonical, filename };
-      downloadText(filename, canonical);
-      downloadText(`${filename}.sha256`, `${sha256}  ${filename}\n`, 'text/plain');
+      state.lastLasher = {
+        record,
+        sha256,
+        canonical,
+        filename,
+        exportText: buildMomentExportText({ record, sha256 }),
+      };
+      if (download) downloadCrystalFile();
       markStep('lasher');
       return { record, sha256 };
     }
+
+    threadEl.addEventListener('click', (e) => {
+      const btn = e.target.closest('.hold-save');
+      if (!btn || btn.disabled) return;
+      if (!state.lastLasher) return;
+      downloadCrystalFile();
+      btn.textContent = 'Saved (one file)';
+      btn.disabled = true;
+    });
 
     composerFile.addEventListener('change', () => {
       state.pendingFiles = [...composerFile.files];
@@ -213,10 +243,10 @@
     async function cutLasher() {
       if (!presentEl.value && !state.lastLasher) throw new Error('Send a message first.');
       if (state.lastLasher) {
-        downloadText(state.lastLasher.filename, state.lastLasher.canonical);
+        downloadCrystalFile();
         return state.lastLasher;
       }
-      return captureMoment(presentEl.value, []);
+      return captureMoment(presentEl.value, [], { download: true });
     }
 
     document.getElementById('btn-cut-lasher').onclick = () =>

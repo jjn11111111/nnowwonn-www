@@ -43,7 +43,20 @@ export async function buildLasherRecordV0(opts) {
   };
   const canonical = JSON.stringify(body, null, 2);
   const sha256 = await sha256Hex(canonical);
-  return { record: body, canonical, sha256, filename: `${id}.json` };
+  const filename = `${id}.json`;
+  const exportText = buildMomentExportText({ record: body, sha256 });
+  return { record: body, canonical, sha256, filename, exportText };
+}
+
+/** Single-file export for NW (seal + moment — no sidecar .sha256). */
+export function buildMomentExportText({ record, sha256 }) {
+  const envelope = {
+    schema: 'NW-Moment-Export-v0',
+    exported_at: new Date().toISOString(),
+    content_sha256: sha256,
+    moment: record,
+  };
+  return JSON.stringify(envelope, null, 2);
 }
 
 export function downloadText(filename, text, mime = 'application/json') {

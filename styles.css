@@ -403,6 +403,23 @@ body.page-onboard .onboard-ladder {
   background: rgba(2, 195, 154, 0.18);
   border: 1px solid rgba(2, 195, 154, 0.35);
 }
+.thread-msg-hold .hold-save {
+  margin: 0.65rem 0 0.35rem;
+  padding: 0.45rem 0.85rem;
+  font-size: 0.82rem;
+  cursor: pointer;
+  border: 1px solid rgba(249, 231, 149, 0.35);
+  background: transparent;
+  color: var(--gold);
+  border-radius: 8px;
+  font-weight: 600;
+}
+.thread-msg-hold .hold-save:hover:not(:disabled) { filter: brightness(1.08); }
+.thread-msg-hold .hold-save:disabled { opacity: 0.65; cursor: default; }
+
+body.composer-has-thread .hero-compact { display: none; }
+body.composer-has-thread .composer-main { padding-top: 0.75rem; }
+
 .thread-msg-hold {
   align-self: flex-start;
   background: rgba(18, 18, 26, 0.95);
