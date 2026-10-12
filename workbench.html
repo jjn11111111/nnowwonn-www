@@ -87,8 +87,8 @@
           </div>
         </div>
         <ul class="wb-links">
-          <li><a href="https://portableri.com/studio.html?shore=nnowwonn">Full Studio · local AI muscle</a></li>
-          <li><a href="https://portableri.com/start.html?from=nnowwonn">PortAbleRI symbiote path</a></li>
+          <li><a href="https://portableri.com/studio.html?shore=nnowwonn" target="_blank" rel="noopener noreferrer">Full Studio · local AI muscle (new tab)</a></li>
+          <li><a href="https://portableri.com/start.html?from=nnowwonn" target="_blank" rel="noopener noreferrer">PortAbleRI symbiote path (new tab)</a></li>
         </ul>
       </details>
     </div>
@@ -139,10 +139,9 @@
 
     function holdResponse(record, sha256) {
       return (
-        `<strong>Held for you.</strong> Your exact words are sealed — not rewritten by cloud AI on this lane.<br>` +
-        `<span class="msg-meta">Crystal id: ${record.id}<br>sha256: <code>${sha256.slice(0, 16)}…</code></span><br>` +
-        `Want deeper reflection? <a href="https://portableri.com/studio.html?shore=nnowwonn">Full Studio</a> (local) or ` +
-        `<a href="https://portableri.com/start.html?from=nnowwonn">PortAbleRI symbiote</a>.`
+        `<strong>Held here on NNoWWoNN.</strong> Your exact words are sealed in this thread — not sent to a cloud model on this lane.<br>` +
+        `<span class="msg-meta">Crystal id: ${record.id} · sha256: <code>${sha256.slice(0, 16)}…</code> · JSON in your Downloads</span><br>` +
+        `Keep typing below — this is still your bench. Optional local AI and PortAbleRI paths live under <strong>Advanced ▾</strong> when you want them.`
       );
     }
 
@@ -300,10 +299,20 @@
       }
     };
 
-    const openingDraft = consumeOpeningDraft();
+    const params = new URLSearchParams(location.search);
+    let openingDraft = consumeOpeningDraft();
+    if (!openingDraft && params.has('q')) {
+      openingDraft = params.get('q') || '';
+      try {
+        history.replaceState(null, '', location.pathname);
+      } catch {
+        /* */
+      }
+    }
     if (openingDraft) {
       composerInput.value = openingDraft;
       composerInput.focus();
+      document.getElementById('wb-title').textContent = 'Your moment';
       requestAnimationFrame(() => form.requestSubmit());
     } else {
       renderThread();

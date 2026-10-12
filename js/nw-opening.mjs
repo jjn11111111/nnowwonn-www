@@ -20,7 +20,9 @@ export function consumeOpeningDraft() {
 }
 
 export function goToWorkbench(text) {
-  saveOpeningDraft(text);
-  const q = text.trim() ? '' : '';
-  location.href = `workbench.html${q}`;
+  const t = String(text ?? '').trim();
+  saveOpeningDraft(t);
+  const url = new URL('workbench.html', location.href);
+  if (t) url.searchParams.set('q', t.slice(0, 2000));
+  location.href = `${url.pathname}${url.search}`;
 }
