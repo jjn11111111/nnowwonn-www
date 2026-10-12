@@ -432,19 +432,20 @@ body.page-enterface .enterface-nav {
   border-bottom-color: rgba(255, 255, 255, 0.04);
   background: rgba(0, 0, 0, 0.35);
 }
-body.composer-has-thread .enterface-family {
-  order: -1;
-  margin-bottom: 0.5rem;
-}
-body:not(.composer-has-thread) .enterface-family {
-  margin-top: 1.25rem;
+body.composer-has-thread #family-details {
+  margin-top: 1rem;
+  opacity: 0.92;
 }
 
-.enterface-family-title {
+.enterface-family-title,
+#family-details summary.enterface-family-title {
   color: var(--gold);
   font-size: 1rem;
   margin: 0 0 0.35rem;
+  cursor: pointer;
 }
+#family-details summary.enterface-family-title { margin: 0; list-style: none; }
+#family-details summary.enterface-family-title::-webkit-details-marker { display: none; }
 .enterface-family-lead { margin: 0 0 1rem; }
 
 .family-grid {

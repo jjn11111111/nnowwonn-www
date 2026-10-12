@@ -1,5 +1,7 @@
 /** Opening screen → Workbench handoff */
 export const DRAFT_KEY = 'nw-opening-draft-v1';
+/** Enter from open.html → fresh thread (not merged with old localStorage). */
+export const FRESH_THREAD_KEY = 'nw-enterface-fresh-v1';
 
 export function saveOpeningDraft(text) {
   try {
@@ -24,6 +26,11 @@ const CANON_ORIGIN = 'https://www.nnowwonn.com';
 export function goToWorkbench(text) {
   const t = String(text ?? '').trim();
   saveOpeningDraft(t);
+  try {
+    sessionStorage.setItem(FRESH_THREAD_KEY, '1');
+  } catch {
+    /* */
+  }
   const url = new URL('workbench.html', `${CANON_ORIGIN}/`);
   if (t) url.searchParams.set('q', t.slice(0, 2000));
   location.href = url.href;

@@ -9,6 +9,11 @@
   <title>EnterFace · NOW:WON</title>
   <link rel="manifest" href="manifest.webmanifest" />
   <link rel="stylesheet" href="styles.css" />
+  <script>
+    if (location.hostname === 'nnowwonn.com') {
+      location.replace('https://www.nnowwonn.com' + location.pathname + location.search + location.hash);
+    }
+  </script>
 </head>
 <body class="page-opening page-enterface" data-enterface="minimal">
   <a class="skip-link skip-link-opening" href="#opening-input">Skip to typing</a>

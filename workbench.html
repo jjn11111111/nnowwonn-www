@@ -8,6 +8,11 @@
   <title>EnterFace Workbench · KaiRis family · NNoWWoNN</title>
   <link rel="manifest" href="manifest.webmanifest" />
   <link rel="stylesheet" href="styles.css" />
+  <script>
+    if (location.hostname === 'nnowwonn.com') {
+      location.replace('https://www.nnowwonn.com' + location.pathname + location.search + location.hash);
+    }
+  </script>
 </head>
 <body class="page-workbench page-composer page-enterface" data-enterface="thread" data-face="hearth">
   <a class="skip-link" href="#composer-input">Skip to message</a>
@@ -51,12 +56,6 @@
         <button type="submit" class="btn btn-primary composer-send" id="btn-send">Send</button>
       </form>
       <p class="composer-hint" id="attach-hint"></p>
-
-      <section class="enterface-family card" aria-labelledby="family-heading">
-        <h2 id="family-heading" class="enterface-family-title">KaiRis family systems</h2>
-        <p class="fine enterface-family-lead">Named lanes · P ≠ K ≠ R · default deny egress · HOST allow per click.</p>
-        <div id="family-systems" class="family-grid"></div>
-      </section>
 
       <details class="card composer-advanced" id="section-advanced">
         <summary>Advanced · verify law · export · technical names</summary>
@@ -111,6 +110,12 @@
           <li><a href="unpack.html">Architecture unpack (L0–L5)</a></li>
         </ul>
       </details>
+
+      <details class="enterface-family card" id="family-details">
+        <summary class="enterface-family-title" id="family-heading">KaiRis family systems · optional lanes</summary>
+        <p class="fine enterface-family-lead">Named lanes · P ≠ K ≠ R · default deny egress · HOST allow per click. Your thread stays above — this is not the answer to your question.</p>
+        <div id="family-systems" class="family-grid"></div>
+      </details>
     </div>
   </main>
 
@@ -118,10 +123,10 @@
     import './js/nw-canonical-host.mjs';
     import { registerEnterFaceShell } from './js/nw-enterface-shell.mjs';
     registerEnterFaceShell();
-    import { buildLasherRecordV0, buildMomentExportText, downloadText, loadPariBrowser } from './js/nw-workbench.mjs?v=20261012-6';
-    import { loadThread, saveThread, slugFromText } from './js/nw-composer-thread.mjs?v=20261012-6';
+    import { buildLasherRecordV0, buildMomentExportText, downloadText, loadPariBrowser } from './js/nw-workbench.mjs?v=20261012-8';
+    import { loadThread, saveThread, slugFromText } from './js/nw-composer-thread.mjs?v=20261012-8';
     import { markStep } from './js/nw-onboard-progress.mjs';
-    import { consumeOpeningDraft } from './js/nw-opening.mjs?v=20261012-6';
+    import { consumeOpeningDraft, FRESH_THREAD_KEY } from './js/nw-opening.mjs?v=20261012-8';
     import { renderFamilySystems } from './js/nw-family-systems.mjs?v=20261012-6';
 
     const threadEl = document.getElementById('thread');
@@ -140,8 +145,21 @@
     let state = { bootstrap: null, manifest: null, lastLasher: null, pendingFiles: [] };
     let messages = loadThread();
 
+    function stripQueryFromUrl() {
+      if (!location.search) return;
+      try {
+        history.replaceState(null, '', location.pathname + location.hash);
+      } catch {
+        /* */
+      }
+    }
+
+    const familyDetails = document.getElementById('family-details');
+
     function syncComposerChrome() {
-      document.body.classList.toggle('composer-has-thread', messages.length > 0);
+      const has = messages.length > 0;
+      document.body.classList.toggle('composer-has-thread', has);
+      if (familyDetails) familyDetails.open = !has;
     }
 
     function downloadCrystalFile() {
@@ -185,7 +203,12 @@
     function holdResponse(record, sha256) {
       const full = String(record.first_form ?? '');
       const snippet = full.slice(0, 120);
+      const identityQ = /\b(who am i|who i am|know who|know me|do you know|that is me|i am uncle|i'm uncle)\b/i.test(full);
+      const identityBlock = identityQ
+        ? `<strong>On “who am I?”</strong> This shore has no hidden profile of you — no cloud memory, no dossier. What you declare here (e.g. Uncle Jeremy) is <em>your</em> first-form truth in this thread, sealed on your device until you say otherwise.<br>`
+        : '';
       return (
+        identityBlock +
         `<strong>Held here on NNoWWoNN.</strong> I don’t know you the way a person would — but I see what you wrote, and it stays in <em>your</em> thread on this shore.<br>` +
         (snippet ? `<span class="msg-meta">You: “${escHtml(snippet)}${full.length > 120 ? '…' : ''}”</span><br>` : '') +
         `<span class="msg-meta">Moment id: ${record.id} · seal: <code>${sha256.slice(0, 16)}…</code></span><br>` +
@@ -368,11 +391,17 @@
     let openingDraft = consumeOpeningDraft();
     if (!openingDraft && params.has('q')) {
       openingDraft = params.get('q') || '';
-      try {
-        history.replaceState(null, '', location.pathname);
-      } catch {
-        /* */
+    }
+    if (params.has('q')) stripQueryFromUrl();
+
+    try {
+      if (sessionStorage.getItem(FRESH_THREAD_KEY)) {
+        sessionStorage.removeItem(FRESH_THREAD_KEY);
+        messages = [];
+        saveThread([]);
       }
+    } catch {
+      /* */
     }
     async function holdOpeningDraft(text) {
       const t = String(text ?? '').trim();
@@ -391,6 +420,7 @@
         renderThread();
       }
       composerInput.focus();
+      threadEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
 
     renderFamilySystems(document.getElementById('family-systems'));
