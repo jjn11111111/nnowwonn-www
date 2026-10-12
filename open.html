@@ -7,6 +7,7 @@
   <meta name="theme-color" content="#000000" />
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
   <title>EnterFace · NOW:WON</title>
+  <link rel="manifest" href="manifest.webmanifest" />
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body class="page-opening page-enterface" data-enterface="minimal">
@@ -33,12 +34,14 @@
 
   <footer class="opening-footer">
     <span class="opening-mark">NNoWWoNN</span>
-    <span class="opening-sub">EnterFace · NOW:WON · no pipe · <a href="cookioe.html" class="opening-cookioe">Cookioe</a> · yours</span>
+    <span class="opening-sub">EnterFace · NOW:WON · no pipe · <a href="cookioe.html" class="opening-cookioe">Cookioe</a> · <a href="unpack.html" class="opening-cookioe">Unpack</a> · yours</span>
   </footer>
 
   <script type="module">
     import './js/nw-canonical-host.mjs';
+    import { registerEnterFaceShell } from './js/nw-enterface-shell.mjs';
     import { goToWorkbench } from './js/nw-opening.mjs';
+    registerEnterFaceShell();
 
     const input = document.getElementById('opening-input');
     const ghost = document.getElementById('opening-ghost');

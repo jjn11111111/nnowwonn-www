@@ -6,6 +6,7 @@
   <meta name="description" content="EnterFace Workbench — interact with the KaiRis family of systems from one HOST-owned thread. Hold first; choose lanes when ready." />
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
   <title>EnterFace Workbench · KaiRis family · NNoWWoNN</title>
+  <link rel="manifest" href="manifest.webmanifest" />
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body class="page-workbench page-composer page-enterface" data-enterface="thread" data-face="hearth">
@@ -14,6 +15,7 @@
     <div class="wrap wrap-nav">
       <a href="open.html">EnterFace</a>
       <span class="nav-path nav-path-hearth" id="nav-face">Workbench</span>
+      <a href="unpack.html" class="wb-nav-alt">Unpack</a>
       <a href="onboard.html" class="wb-nav-alt">Tour</a>
     </div>
   </nav>
@@ -94,9 +96,19 @@
             <pre class="wb-log" id="forge-preview" aria-live="polite">—</pre>
           </div>
         </div>
+        <div class="card local-reflect-note">
+          <h3 class="wb-substep">Local reflect (layer L4)</h3>
+          <p class="fine">
+            EnterFace on <strong>www</strong> has <strong>no cloud chat pipe</strong>. Browsers block HTTPS sites from calling
+            <code>127.0.0.1</code> Ollama directly. For AI muscle: run
+            <a href="https://portableri.com/studio.html?shore=nnowwonn" target="_blank" rel="noopener noreferrer">Studio on your Mac</a>
+            or read <a href="unpack.html">Unpack · L4</a>.
+          </p>
+        </div>
         <ul class="wb-links">
           <li><a href="https://portableri.com/studio.html?shore=nnowwonn" target="_blank" rel="noopener noreferrer">Full Studio · local AI muscle (new tab)</a></li>
           <li><a href="https://portableri.com/start.html?from=nnowwonn" target="_blank" rel="noopener noreferrer">PortAbleRI symbiote path (new tab)</a></li>
+          <li><a href="unpack.html">Architecture unpack (L0–L5)</a></li>
         </ul>
       </details>
     </div>
@@ -104,6 +116,8 @@
 
   <script type="module">
     import './js/nw-canonical-host.mjs';
+    import { registerEnterFaceShell } from './js/nw-enterface-shell.mjs';
+    registerEnterFaceShell();
     import { buildLasherRecordV0, buildMomentExportText, downloadText, loadPariBrowser } from './js/nw-workbench.mjs?v=20261012-6';
     import { loadThread, saveThread, slugFromText } from './js/nw-composer-thread.mjs?v=20261012-6';
     import { markStep } from './js/nw-onboard-progress.mjs';
