@@ -374,7 +374,12 @@ body.page-onboard .onboard-ladder {
 .hero-compact .lead { font-size: 0.95rem; max-width: 40rem; opacity: 0.92; }
 
 .composer-main { padding-bottom: 5rem; }
-.composer-wrap { max-width: 44rem; margin: 0 auto; }
+.composer-wrap {
+  max-width: 44rem;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+}
 
 .composer-thread {
   min-height: 12rem;
@@ -419,6 +424,86 @@ body.page-onboard .onboard-ladder {
 
 body.composer-has-thread .hero-compact { display: none; }
 body.composer-has-thread .composer-main { padding-top: 0.75rem; }
+
+body.page-enterface.page-composer {
+  background: #050508;
+}
+body.page-enterface .enterface-nav {
+  border-bottom-color: rgba(255, 255, 255, 0.04);
+  background: rgba(0, 0, 0, 0.35);
+}
+body.composer-has-thread .enterface-family {
+  order: -1;
+  margin-bottom: 0.5rem;
+}
+body:not(.composer-has-thread) .enterface-family {
+  margin-top: 1.25rem;
+}
+
+.enterface-family-title {
+  color: var(--gold);
+  font-size: 1rem;
+  margin: 0 0 0.35rem;
+}
+.enterface-family-lead { margin: 0 0 1rem; }
+
+.family-grid {
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: 1fr;
+}
+@media (min-width: 640px) {
+  .family-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (min-width: 960px) {
+  .family-grid { grid-template-columns: repeat(3, 1fr); }
+}
+
+.family-card {
+  position: relative;
+  padding: 0.85rem 1rem;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(0, 0, 0, 0.25);
+}
+.family-card-here {
+  border-color: rgba(2, 195, 154, 0.45);
+  background: rgba(2, 195, 154, 0.06);
+}
+.family-tag {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+}
+.family-card h3 {
+  font-size: 0.92rem;
+  color: var(--gold);
+  margin: 0.35rem 0 0.25rem;
+}
+.family-blurb {
+  font-size: 0.8rem;
+  color: var(--off);
+  opacity: 0.88;
+  margin: 0 0 0.65rem;
+  line-height: 1.4;
+}
+.family-here-mark {
+  font-size: 0.75rem;
+  color: var(--teal);
+  font-weight: 600;
+}
+.family-open {
+  display: inline-block;
+  padding: 0.4rem 0.75rem !important;
+  font-size: 0.78rem !important;
+}
+.family-note {
+  font-size: 0.75rem;
+  color: var(--muted);
+  margin: 0;
+  font-style: italic;
+}
 
 .thread-msg-hold {
   align-self: flex-start;

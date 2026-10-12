@@ -3,25 +3,26 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="description" content="NOW:WON Workbench — ask, type, attach. Your moment held as a verifiable crystal. No login required." />
+  <meta name="description" content="EnterFace Workbench — interact with the KaiRis family of systems from one HOST-owned thread. Hold first; choose lanes when ready." />
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
-  <title>NOW:WON Workbench · NNoWWoNN</title>
+  <title>EnterFace Workbench · KaiRis family · NNoWWoNN</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body class="page-workbench page-composer page-enterface" data-enterface="thread" data-face="hearth">
-  <nav class="top" aria-label="NOW:WON">
+  <nav class="top enterface-nav" aria-label="EnterFace">
     <div class="wrap wrap-nav">
-      <a href="index.html">NNoWWoNN</a>
+      <a href="open.html">EnterFace</a>
       <span class="nav-path nav-path-hearth" id="nav-face">Workbench</span>
-      <a href="onboard.html" class="wb-nav-alt">Help</a>
+      <a href="onboard.html" class="wb-nav-alt">Tour</a>
     </div>
   </nav>
 
   <header class="hero hero-wb hero-compact">
     <div class="wrap">
-      <h1 id="wb-title">What’s on your mind?</h1>
+      <h1 id="wb-title">EnterFace Workbench</h1>
       <p class="lead" id="wb-lead">
-        Type like you would in any chat. We <strong>hold</strong> your words in this thread first — no Finder pop, no cloud model unless you choose it later.
+        One thread for <strong>you</strong> — gateway to the <strong>KaiRis family</strong> of systems (NOW:WON · PortAbleRI · verify · library · witness).
+        Hold here first; open other lanes only when you choose.
       </p>
     </div>
   </header>
@@ -29,7 +30,7 @@
   <main class="composer-main">
     <div class="wrap composer-wrap">
       <div class="composer-thread" id="thread" aria-live="polite" aria-label="Your moments">
-        <p class="thread-empty" id="thread-empty">Your thoughts appear here. Nothing is sent to a cloud model until you choose that path.</p>
+        <p class="thread-empty" id="thread-empty">Your thoughts appear here. This portal has <strong>no NW pipe</strong> to a cloud model — hold stays on your device until you choose another lane.</p>
       </div>
 
       <form class="composer-bar" id="composer-form" aria-label="Message input">
@@ -47,6 +48,12 @@
         <button type="submit" class="btn btn-primary composer-send" id="btn-send">Send</button>
       </form>
       <p class="composer-hint" id="attach-hint"></p>
+
+      <section class="enterface-family card" aria-labelledby="family-heading">
+        <h2 id="family-heading" class="enterface-family-title">KaiRis family systems</h2>
+        <p class="fine enterface-family-lead">Named lanes · P ≠ K ≠ R · default deny egress · HOST allow per click.</p>
+        <div id="family-systems" class="family-grid"></div>
+      </section>
 
       <details class="card composer-advanced" id="section-advanced">
         <summary>Advanced · verify law · export · technical names</summary>
@@ -96,10 +103,11 @@
 
   <script type="module">
     import './js/nw-canonical-host.mjs';
-    import { buildLasherRecordV0, buildMomentExportText, downloadText, loadPariBrowser } from './js/nw-workbench.mjs?v=20261012-4';
-    import { loadThread, saveThread, slugFromText } from './js/nw-composer-thread.mjs?v=20261012-4';
+    import { buildLasherRecordV0, buildMomentExportText, downloadText, loadPariBrowser } from './js/nw-workbench.mjs?v=20261012-5';
+    import { loadThread, saveThread, slugFromText } from './js/nw-composer-thread.mjs?v=20261012-5';
     import { markStep } from './js/nw-onboard-progress.mjs';
-    import { consumeOpeningDraft } from './js/nw-opening.mjs?v=20261012-4';
+    import { consumeOpeningDraft } from './js/nw-opening.mjs?v=20261012-5';
+    import { renderFamilySystems } from './js/nw-family-systems.mjs?v=20261012-5';
 
     const threadEl = document.getElementById('thread');
     const threadEmpty = document.getElementById('thread-empty');
@@ -369,6 +377,8 @@
       }
       composerInput.focus();
     }
+
+    renderFamilySystems(document.getElementById('family-systems'));
 
     if (openingDraft) {
       holdOpeningDraft(openingDraft);
