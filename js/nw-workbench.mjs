@@ -26,7 +26,12 @@ export async function buildLasherRecordV0(opts) {
   if (!firstForm && !(opts.attachments?.length)) throw new Error('Type a message or attach a file.');
   const capture = new Date().toISOString();
   const date = capture.slice(0, 10);
-  const slug = slugify(opts.slug);
+  const asciiSlug = slugify(opts.slug || firstForm);
+  const formHash = firstForm
+    ? (await sha256Hex(firstForm)).slice(0, 8)
+    : (await sha256Hex(JSON.stringify(opts.attachments ?? []))).slice(0, 8);
+  const slug =
+    asciiSlug && asciiSlug !== 'Present-Moment' ? asciiSlug.slice(0, 40) : `u-${formHash}`;
   const id = `LASHER-${date}_${slug}_v0`;
   const body = {
     schema: 'PortAbleRI-Lasher-v0',

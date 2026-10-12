@@ -666,6 +666,56 @@ body.page-opening {
   50% { opacity: 0; }
 }
 
+@media (prefers-reduced-motion: reduce) {
+  .opening-caret {
+    animation: none;
+    opacity: 1;
+  }
+}
+
+.skip-link {
+  position: absolute;
+  left: -9999px;
+  top: 0.5rem;
+  z-index: 100;
+  padding: 0.65rem 1rem;
+  min-height: 2.75rem;
+  min-width: 2.75rem;
+  background: var(--teal);
+  color: #0a0a0f;
+  font-weight: 600;
+  border-radius: 8px;
+  text-decoration: none;
+}
+.skip-link:focus {
+  left: max(1rem, env(safe-area-inset-left));
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+.skip-link-opening:focus {
+  top: max(3.5rem, env(safe-area-inset-top));
+}
+
+/* Touch target floor (~44px) · EnterFace v0.4 */
+.touch-target,
+.composer-send,
+.composer-attach,
+.hold-save,
+.family-open,
+.opening-skip {
+  min-height: 2.75rem;
+  min-width: 2.75rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.composer-attach { padding: 0.5rem 0.65rem; }
+.opening-skip {
+  padding: 0.5rem 0.75rem;
+  min-height: 2.75rem;
+  line-height: 1.2;
+}
+
 .opening-hint {
   margin-top: 2.5rem;
   font-size: 0.8rem;

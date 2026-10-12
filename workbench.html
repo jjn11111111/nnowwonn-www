@@ -9,6 +9,7 @@
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body class="page-workbench page-composer page-enterface" data-enterface="thread" data-face="hearth">
+  <a class="skip-link" href="#composer-input">Skip to message</a>
   <nav class="top enterface-nav" aria-label="EnterFace">
     <div class="wrap wrap-nav">
       <a href="open.html">EnterFace</a>
@@ -27,7 +28,7 @@
     </div>
   </header>
 
-  <main class="composer-main">
+  <main class="composer-main" id="composer-main">
     <div class="wrap composer-wrap">
       <div class="composer-thread" id="thread" aria-live="polite" aria-label="Your moments">
         <p class="thread-empty" id="thread-empty">Your thoughts appear here. This portal has <strong>no NW pipe</strong> to a cloud model — hold stays on your device until you choose another lane.</p>
@@ -103,11 +104,11 @@
 
   <script type="module">
     import './js/nw-canonical-host.mjs';
-    import { buildLasherRecordV0, buildMomentExportText, downloadText, loadPariBrowser } from './js/nw-workbench.mjs?v=20261012-5';
-    import { loadThread, saveThread, slugFromText } from './js/nw-composer-thread.mjs?v=20261012-5';
+    import { buildLasherRecordV0, buildMomentExportText, downloadText, loadPariBrowser } from './js/nw-workbench.mjs?v=20261012-6';
+    import { loadThread, saveThread, slugFromText } from './js/nw-composer-thread.mjs?v=20261012-6';
     import { markStep } from './js/nw-onboard-progress.mjs';
-    import { consumeOpeningDraft } from './js/nw-opening.mjs?v=20261012-5';
-    import { renderFamilySystems } from './js/nw-family-systems.mjs?v=20261012-5';
+    import { consumeOpeningDraft } from './js/nw-opening.mjs?v=20261012-6';
+    import { renderFamilySystems } from './js/nw-family-systems.mjs?v=20261012-6';
 
     const threadEl = document.getElementById('thread');
     const threadEmpty = document.getElementById('thread-empty');
@@ -384,6 +385,7 @@
       holdOpeningDraft(openingDraft);
     } else {
       renderThread();
+      composerInput.focus();
     }
   </script>
 </body>

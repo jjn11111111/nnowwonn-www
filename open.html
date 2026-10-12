@@ -10,7 +10,8 @@
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body class="page-opening page-enterface" data-enterface="minimal">
-  <a class="opening-skip" href="workbench.html">Skip</a>
+  <a class="skip-link skip-link-opening" href="#opening-input">Skip to typing</a>
+  <a class="opening-skip" href="workbench.html">Skip to Workbench</a>
 
   <main class="opening-stage" aria-label="EnterFace · begin typing">
     <div class="opening-line" id="opening-line">
@@ -18,6 +19,7 @@
       <div
         class="opening-input"
         id="opening-input"
+        tabindex="0"
         contenteditable="true"
         role="textbox"
         aria-multiline="true"
