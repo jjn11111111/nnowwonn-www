@@ -694,3 +694,10 @@ body.page-opening {
   color: rgba(245, 245, 247, 0.32);
 }
 .opening-mark { color: rgba(245, 245, 247, 0.5); font-weight: 600; }
+.opening-cookioe {
+  color: rgba(2, 195, 154, 0.75);
+  text-decoration: none;
+  text-transform: none;
+  letter-spacing: 0.02em;
+}
+.opening-cookioe:hover { color: rgba(2, 195, 154, 1); }
