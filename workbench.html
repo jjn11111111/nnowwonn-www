@@ -12,9 +12,29 @@
     <div class="wrap wrap-nav">
       <a href="index.html">NNoWWoNN</a>
       <span class="nav-path nav-path-hearth" id="nav-face">Workbench</span>
+      <a href="onboard.html" class="wb-nav-alt">Onboarding</a>
       <a href="hearth.html" class="wb-nav-alt">Hearth</a>
       <a href="forge.html" class="wb-nav-alt">Forge</a>
     </div>
+  </nav>
+
+  <div class="wrap" id="onboard-coach" hidden>
+    <div class="onboard-coach-banner" role="status">
+      <p id="coach-text">Beat 1 · Type your present moment, then cut a lasher.</p>
+      <div class="actions" style="margin:0">
+        <a class="btn btn-secondary" href="onboard.html">Full ladder</a>
+        <button type="button" class="btn btn-secondary" id="btn-coach-next">Next beat</button>
+        <button type="button" class="btn btn-secondary" id="btn-coach-dismiss">Dismiss</button>
+      </div>
+    </div>
+  </div>
+
+  <nav class="wrap wb-stepper" aria-label="Workbench progress">
+    <ol class="wb-steps">
+      <li id="step-li-record" class="wb-step wb-step-active"><span>1</span> Record</li>
+      <li id="step-li-cut" class="wb-step"><span>2</span> Cut lasher</li>
+      <li id="step-li-custody" class="wb-step"><span>3</span> Custody</li>
+    </ol>
   </nav>
 
   <header class="hero hero-wb">
@@ -31,8 +51,8 @@
 
   <main>
     <div class="wrap wb-layout">
-      <section class="card wb-input-card" aria-label="Present moment input">
-        <h2>Input</h2>
+      <section class="card wb-input-card" id="section-record" aria-label="Present moment input">
+        <h2>1 · Record · input</h2>
         <label class="wb-field">
           <span>Short name (for lasher id)</span>
           <input type="text" id="lasher-slug" placeholder="e.g. TriNityLock · Morning-note" maxlength="48" />
@@ -49,6 +69,7 @@
           <span>Present moment (first form — earliest visible text)</span>
           <textarea id="present-moment" rows="10" placeholder="What is true in this moment, in your words…"></textarea>
         </label>
+        <h3 class="wb-substep" id="section-cut">2 · Cut lasher</h3>
         <div class="actions">
           <button type="button" class="btn btn-primary" id="btn-cut-lasher">Cut lasher · download JSON</button>
           <button type="button" class="btn btn-secondary" id="btn-cut-md">Download · markdown sidecar</button>
@@ -57,23 +78,27 @@
       </section>
 
       <aside class="wb-side">
-        <article class="card">
-          <h2>Forge lane · law pins</h2>
-          <p class="fine">Verify public trust manifest (PortAbleRI CDN).</p>
+        <article class="card" id="section-custody">
+          <h2>3 · Custody · law pins</h2>
+          <p class="fine">Verify manifest · bootstrap worldline · export bundle (optional after lasher).</p>
           <div class="actions">
             <button type="button" class="btn btn-secondary" id="btn-verify">Verify manifest</button>
             <button type="button" class="btn btn-secondary" id="btn-bootstrap">New bootstrap</button>
             <button type="button" class="btn btn-secondary" id="btn-export" disabled>Download export bundle</button>
           </div>
+          <label class="wb-field" style="margin-top:0.75rem">
+            <span>Resume · load prior export</span>
+            <input type="file" id="import-bundle" accept="application/json,.json" />
+          </label>
           <pre class="wb-log" id="forge-preview" aria-live="polite">—</pre>
         </article>
         <article class="card">
-          <h2>More power</h2>
+          <h2>Next shores</h2>
           <ul class="wb-links">
+            <li><a href="onboard.html">Onboarding ladder</a></li>
             <li><a href="https://portableri.com/studio.html?shore=nnowwonn">Full Studio</a> · Ollama local muscle</li>
-            <li><a href="https://portableri.com/onboarding.html?begin=1#step-export">PortAbleRI onboarding</a></li>
+            <li><a href="https://portableri.com/start.html?from=nnowwonn">PortAbleRI · PARI path</a></li>
             <li><a href="https://portableri.com/verify.html">verify.html</a></li>
-            <li><a href="enter.html">Instant → Studio redirect</a></li>
           </ul>
         </article>
       </aside>
@@ -87,9 +112,17 @@
       downloadText,
       loadPariBrowser,
     } from './js/nw-workbench.mjs';
+    import {
+      loadProgress,
+      markStep,
+      dismissCoach,
+      resetProgress,
+    } from './js/nw-onboard-progress.mjs';
 
     const params = new URLSearchParams(location.search);
     const face = (params.get('face') || 'hearth').toLowerCase();
+    const onboard = params.get('onboard') === '1';
+    const stepParam = params.get('step') || '';
     document.body.dataset.face = face;
     const navFace = document.getElementById('nav-face');
     const title = document.getElementById('wb-title');
@@ -110,6 +143,83 @@
     const btnExport = document.getElementById('btn-export');
 
     let state = { bootstrap: null, manifest: null, lastLasher: null };
+    let progress = loadProgress();
+
+    const coachEl = document.getElementById('onboard-coach');
+    const coachText = document.getElementById('coach-text');
+    const coachBeats = [
+      'Beat 1 · Type present moment · short name · tier.',
+      'Beat 2 · Cut lasher — JSON + sha256 download.',
+      'Beat 3 · Verify manifest · bootstrap · export bundle.',
+      'Done · Optional PARI symbiote on portableri.com/start.html',
+    ];
+    let coachIndex = 0;
+
+    function syncStepper() {
+      const liRecord = document.getElementById('step-li-record');
+      const liCut = document.getElementById('step-li-cut');
+      const liCustody = document.getElementById('step-li-custody');
+      liRecord.className = 'wb-step' + (progress.lasher ? ' wb-step-done' : ' wb-step-active');
+      liCut.className =
+        'wb-step' + (progress.lasher ? ' wb-step-done' : progress.verify ? ' wb-step-active' : '');
+      liCustody.className =
+        'wb-step' + (progress.export ? ' wb-step-done' : progress.lasher ? ' wb-step-active' : '');
+      if (progress.verify && !progress.lasher) liRecord.classList.add('wb-step-done');
+    }
+
+    function showCoach() {
+      if (!onboard || progress.dismissed) {
+        coachEl.hidden = true;
+        return;
+      }
+      coachEl.hidden = false;
+      coachText.textContent = coachBeats[coachIndex] ?? coachBeats[0];
+    }
+
+    function scrollToStep(step) {
+      const map = {
+        welcome: 'section-record',
+        lasher: 'section-record',
+        verify: 'section-custody',
+        export: 'section-custody',
+      };
+      const id = map[step];
+      if (id) document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    syncStepper();
+    showCoach();
+    if (stepParam) scrollToStep(stepParam);
+
+    document.getElementById('btn-coach-dismiss')?.addEventListener('click', () => {
+      progress = dismissCoach();
+      coachEl.hidden = true;
+    });
+    document.getElementById('btn-coach-next')?.addEventListener('click', () => {
+      coachIndex = Math.min(coachIndex + 1, coachBeats.length - 1);
+      coachText.textContent = coachBeats[coachIndex];
+      if (coachIndex === 1) presentEl.focus();
+      if (coachIndex === 2) document.getElementById('section-custody')?.scrollIntoView({ behavior: 'smooth' });
+    });
+
+    document.getElementById('import-bundle')?.addEventListener('change', async (ev) => {
+      const file = ev.target.files?.[0];
+      if (!file) return;
+      try {
+        const bundle = JSON.parse(await file.text());
+        const kb = bundle.kernel_bootstrap;
+        if (!kb?.worldline_id) throw new Error('Missing kernel_bootstrap');
+        state.bootstrap = kb;
+        btnExport.disabled = false;
+        forgePrev.textContent = JSON.stringify({ loaded: file.name, worldline_id: kb.worldline_id }, null, 2);
+        logForge(`Loaded export · ${kb.worldline_id}`);
+        progress = markStep('export');
+        syncStepper();
+      } catch (e) {
+        logForge(`Import: ${e.message}`);
+      }
+      ev.target.value = '';
+    });
 
     function logForge(msg) {
       forgePrev.textContent = `${new Date().toISOString()}\n${msg}\n\n${forgePrev.textContent}`.slice(0, 8000);
@@ -129,6 +239,8 @@
       downloadText(filename, canonical);
       downloadText(`${filename}.sha256`, sidecar, 'text/plain');
       logForge(`Lasher cut · ${record.id}`);
+      progress = markStep('lasher');
+      syncStepper();
       return { record, canonical, sha256, filename };
     }
 
@@ -154,6 +266,8 @@
         const v = await pari.verifyTrustManifestInBrowser(state.manifest);
         forgePrev.textContent = JSON.stringify(v, null, 2);
         logForge('Manifest verified');
+        progress = markStep('verify');
+        syncStepper();
       } catch (e) {
         logForge(`Verify failed: ${e.message} — open Full Studio on portableri.com if CDN blocked.`);
       }
@@ -189,10 +303,16 @@
         const name = `now-won-studio-export-${state.bootstrap.worldline_id.slice(0, 8)}.json`;
         pari.downloadJson(name, bundle);
         logForge(`Export downloaded · ${name}`);
+        progress = markStep('export');
+        syncStepper();
       } catch (e) {
         logForge(`Export: ${e.message}`);
       }
     };
+
+    document.addEventListener('keydown', (e) => {
+      if (e.altKey && e.key === '0') resetProgress();
+    });
   </script>
 </body>
 </html>
