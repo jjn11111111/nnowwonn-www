@@ -1,6 +1,6 @@
 # nnowwonn-www · NOW:WON short shore
 
-Open-access HTML shore for **`www.nnowwonn.com`** · canonical Studio on PortAbleRI (`studio.html?shore=nnowwonn`).
+Open-access HTML shore for **`www.nnowwonn.com`** · **dual entry:** `index.html` (chooser) · **Hearth** (`hearth.html`) · **Forge** (`forge.html`) · canonical Studio on PortAbleRI.
 
 **Do not** merge into `portableri-www` (that repo’s `CNAME` is `portableri.com`).
 

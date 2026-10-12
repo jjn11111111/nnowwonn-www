@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="NOW:WON Workbench — present-moment input, lasher cut, verify law. No login · no symbiote required." />
+  <title>NOW:WON Workbench · NNoWWoNN</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body class="page-workbench" data-face="hearth">
+  <nav class="top" aria-label="NOW:WON">
+    <div class="wrap wrap-nav">
+      <a href="index.html">NNoWWoNN</a>
+      <span class="nav-path nav-path-hearth" id="nav-face">Workbench</span>
+      <a href="hearth.html" class="wb-nav-alt">Hearth</a>
+      <a href="forge.html" class="wb-nav-alt">Forge</a>
+    </div>
+  </nav>
+
+  <header class="hero hero-wb">
+    <div class="wrap">
+      <p class="eyebrow">KaiRis:T:siRiaK · NOW:WON · v0</p>
+      <h1 id="wb-title">Present moment · your screen</h1>
+      <p class="lead" id="wb-lead">
+        Type here. Cut a <strong>lasher</strong> (crystal unit) — hash, download, yours.
+        No account. No cloud AI required on this lane.
+      </p>
+      <p class="tier"><strong>P ≠ K ≠ R</strong> · PARI symbiote is optional · elsewhere</p>
+    </div>
+  </header>
+
+  <main>
+    <div class="wrap wb-layout">
+      <section class="card wb-input-card" aria-label="Present moment input">
+        <h2>Input</h2>
+        <label class="wb-field">
+          <span>Short name (for lasher id)</span>
+          <input type="text" id="lasher-slug" placeholder="e.g. TriNityLock · Morning-note" maxlength="48" />
+        </label>
+        <label class="wb-field">
+          <span>Tier</span>
+          <select id="lasher-tier">
+            <option value="A">A · fact</option>
+            <option value="B" selected>B · inference / operational</option>
+            <option value="C">C · myth / symbol / doctrine</option>
+          </select>
+        </label>
+        <label class="wb-field">
+          <span>Present moment (first form — earliest visible text)</span>
+          <textarea id="present-moment" rows="10" placeholder="What is true in this moment, in your words…"></textarea>
+        </label>
+        <div class="actions">
+          <button type="button" class="btn btn-primary" id="btn-cut-lasher">Cut lasher · download JSON</button>
+          <button type="button" class="btn btn-secondary" id="btn-cut-md">Download · markdown sidecar</button>
+        </div>
+        <pre class="wb-log" id="lasher-preview" aria-live="polite">No lasher cut yet.</pre>
+      </section>
+
+      <aside class="wb-side">
+        <article class="card">
+          <h2>Forge lane · law pins</h2>
+          <p class="fine">Verify public trust manifest (PortAbleRI CDN).</p>
+          <div class="actions">
+            <button type="button" class="btn btn-secondary" id="btn-verify">Verify manifest</button>
+            <button type="button" class="btn btn-secondary" id="btn-bootstrap">New bootstrap</button>
+            <button type="button" class="btn btn-secondary" id="btn-export" disabled>Download export bundle</button>
+          </div>
+          <pre class="wb-log" id="forge-preview" aria-live="polite">—</pre>
+        </article>
+        <article class="card">
+          <h2>More power</h2>
+          <ul class="wb-links">
+            <li><a href="https://portableri.com/studio.html?shore=nnowwonn">Full Studio</a> · Ollama local muscle</li>
+            <li><a href="https://portableri.com/onboarding.html?begin=1#step-export">PortAbleRI onboarding</a></li>
+            <li><a href="https://portableri.com/verify.html">verify.html</a></li>
+            <li><a href="enter.html">Instant → Studio redirect</a></li>
+          </ul>
+        </article>
+      </aside>
+    </div>
+    <p class="seal">AMOR · NOW:WON · lashers add · record holds</p>
+  </main>
+
+  <script type="module">
+    import {
+      buildLasherRecordV0,
+      downloadText,
+      loadPariBrowser,
+    } from './js/nw-workbench.mjs';
+
+    const params = new URLSearchParams(location.search);
+    const face = (params.get('face') || 'hearth').toLowerCase();
+    document.body.dataset.face = face;
+    const navFace = document.getElementById('nav-face');
+    const title = document.getElementById('wb-title');
+    const lead = document.getElementById('wb-lead');
+    if (face === 'forge') {
+      navFace.textContent = 'Forge · Workbench';
+      navFace.className = 'nav-path nav-path-forge';
+      title.textContent = 'Verify · then cut · then export';
+      lead.innerHTML =
+        'Same bench as Hearth — proof-forward copy. Type, hash, download. Optional bootstrap ties crystals to a <strong>worldline</strong>.';
+    }
+
+    const presentEl = document.getElementById('present-moment');
+    const slugEl = document.getElementById('lasher-slug');
+    const tierEl = document.getElementById('lasher-tier');
+    const lasherPrev = document.getElementById('lasher-preview');
+    const forgePrev = document.getElementById('forge-preview');
+    const btnExport = document.getElementById('btn-export');
+
+    let state = { bootstrap: null, manifest: null, lastLasher: null };
+
+    function logForge(msg) {
+      forgePrev.textContent = `${new Date().toISOString()}\n${msg}\n\n${forgePrev.textContent}`.slice(0, 8000);
+    }
+
+    async function cutLasher() {
+      const { record, canonical, sha256, filename } = await buildLasherRecordV0({
+        firstForm: presentEl.value,
+        slug: slugEl.value || 'Present-Moment',
+        tier: tierEl.value,
+        worldlineId: state.bootstrap?.worldline_id ?? null,
+        shore: 'nnowwonn.com/workbench.html',
+      });
+      state.lastLasher = { record, sha256 };
+      const sidecar = `${sha256}  ${filename}\n`;
+      lasherPrev.textContent = JSON.stringify({ ...record, sha256 }, null, 2);
+      downloadText(filename, canonical);
+      downloadText(`${filename}.sha256`, sidecar, 'text/plain');
+      logForge(`Lasher cut · ${record.id}`);
+      return { record, canonical, sha256, filename };
+    }
+
+    document.getElementById('btn-cut-lasher').onclick = () =>
+      cutLasher().catch((e) => {
+        lasherPrev.textContent = e.message;
+      });
+
+    document.getElementById('btn-cut-md').onclick = async () => {
+      try {
+        const { record, sha256, filename } = await cutLasher();
+        const md = `# ${record.id}\n\n**capture:** ${record.capture}  \n**tier:** ${record.tier}  \n**sha256:** \`${sha256}\`\n\n## First form\n\n${record.first_form}\n`;
+        downloadText(filename.replace(/\.json$/, '.md'), md, 'text/markdown');
+      } catch (e) {
+        lasherPrev.textContent = e.message;
+      }
+    };
+
+    document.getElementById('btn-verify').onclick = async () => {
+      try {
+        const pari = await loadPariBrowser();
+        state.manifest = await pari.fetchTrustManifest('https://portableri.com/trust/portableri-trust-manifest.json');
+        const v = await pari.verifyTrustManifestInBrowser(state.manifest);
+        forgePrev.textContent = JSON.stringify(v, null, 2);
+        logForge('Manifest verified');
+      } catch (e) {
+        logForge(`Verify failed: ${e.message} — open Full Studio on portableri.com if CDN blocked.`);
+      }
+    };
+
+    document.getElementById('btn-bootstrap').onclick = async () => {
+      try {
+        const pari = await loadPariBrowser();
+        state.manifest = state.manifest ?? (await pari.fetchTrustManifest('https://portableri.com/trust/portableri-trust-manifest.json'));
+        state.bootstrap = pari.buildKernelBootstrap({
+          manifest: state.manifest,
+          primeModelId: 'local-hearth-1',
+          studioPath: 'KaiRis:T:siRiaK',
+        });
+        btnExport.disabled = false;
+        forgePrev.textContent = JSON.stringify(state.bootstrap, null, 2);
+        logForge(`Bootstrap · ${state.bootstrap.worldline_id}`);
+      } catch (e) {
+        logForge(`Bootstrap: ${e.message}`);
+      }
+    };
+
+    document.getElementById('btn-export').onclick = async () => {
+      if (!state.bootstrap) return;
+      try {
+        const pari = await loadPariBrowser();
+        const bundle = pari.buildExportBundleV1({
+          kernelBootstrap: state.bootstrap,
+          trustManifestSha256: state.bootstrap.trust_manifest_sha256,
+          constitutionSha256: state.bootstrap.constitution_sha256,
+          notes: 'KaiRis:T:siRiaK NOW:WON · NW Workbench v0',
+        });
+        const name = `now-won-studio-export-${state.bootstrap.worldline_id.slice(0, 8)}.json`;
+        pari.downloadJson(name, bundle);
+        logForge(`Export downloaded · ${name}`);
+      } catch (e) {
+        logForge(`Export: ${e.message}`);
+      }
+    };
+  </script>
+</body>
+</html>
