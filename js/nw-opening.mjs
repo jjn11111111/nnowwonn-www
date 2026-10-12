@@ -19,10 +19,12 @@ export function consumeOpeningDraft() {
   }
 }
 
+const CANON_ORIGIN = 'https://www.nnowwonn.com';
+
 export function goToWorkbench(text) {
   const t = String(text ?? '').trim();
   saveOpeningDraft(t);
-  const url = new URL('workbench.html', location.href);
+  const url = new URL('workbench.html', `${CANON_ORIGIN}/`);
   if (t) url.searchParams.set('q', t.slice(0, 2000));
-  location.href = `${url.pathname}${url.search}`;
+  location.href = url.href;
 }

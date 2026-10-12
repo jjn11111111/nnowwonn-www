@@ -3,15 +3,16 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="description" content="NOW:WON — begin typing. Your moment held on NNoWWoNN." />
+  <meta name="description" content="EnterFace · NOW:WON — begin typing. HOST-owned entry. Hold first; no egress without your allow." />
   <meta name="theme-color" content="#000000" />
-  <title>Begin · NOW:WON</title>
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <title>EnterFace · NOW:WON</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
-<body class="page-opening">
+<body class="page-opening page-enterface" data-enterface="minimal">
   <a class="opening-skip" href="workbench.html">Skip</a>
 
-  <main class="opening-stage" aria-label="Begin typing">
+  <main class="opening-stage" aria-label="EnterFace · begin typing">
     <div class="opening-line" id="opening-line">
       <span class="opening-ghost" id="opening-ghost" aria-hidden="true">Begin…</span>
       <div
@@ -30,10 +31,11 @@
 
   <footer class="opening-footer">
     <span class="opening-mark">NNoWWoNN</span>
-    <span class="opening-sub">NOW:WON · hold · verify · yours</span>
+    <span class="opening-sub">EnterFace · NOW:WON · hold · verify · yours</span>
   </footer>
 
   <script type="module">
+    import './js/nw-canonical-host.mjs';
     import { goToWorkbench } from './js/nw-opening.mjs';
 
     const input = document.getElementById('opening-input');

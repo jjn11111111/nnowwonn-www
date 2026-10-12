@@ -4,10 +4,11 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="description" content="NOW:WON Workbench — ask, type, attach. Your moment held as a verifiable crystal. No login required." />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
   <title>NOW:WON Workbench · NNoWWoNN</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
-<body class="page-workbench page-composer" data-face="hearth">
+<body class="page-workbench page-composer page-enterface" data-enterface="thread" data-face="hearth">
   <nav class="top" aria-label="NOW:WON">
     <div class="wrap wrap-nav">
       <a href="index.html">NNoWWoNN</a>
@@ -94,10 +95,11 @@
   </main>
 
   <script type="module">
-    import { buildLasherRecordV0, buildMomentExportText, downloadText, loadPariBrowser } from './js/nw-workbench.mjs';
-    import { loadThread, saveThread, slugFromText } from './js/nw-composer-thread.mjs';
+    import './js/nw-canonical-host.mjs';
+    import { buildLasherRecordV0, buildMomentExportText, downloadText, loadPariBrowser } from './js/nw-workbench.mjs?v=20261012-4';
+    import { loadThread, saveThread, slugFromText } from './js/nw-composer-thread.mjs?v=20261012-4';
     import { markStep } from './js/nw-onboard-progress.mjs';
-    import { consumeOpeningDraft } from './js/nw-opening.mjs';
+    import { consumeOpeningDraft } from './js/nw-opening.mjs?v=20261012-4';
 
     const threadEl = document.getElementById('thread');
     const threadEmpty = document.getElementById('thread-empty');
@@ -150,12 +152,22 @@
       threadEl.scrollTop = threadEl.scrollHeight;
     }
 
+    function escHtml(s) {
+      return String(s)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/"/g, '&quot;');
+    }
+
     function holdResponse(record, sha256) {
+      const full = String(record.first_form ?? '');
+      const snippet = full.slice(0, 120);
       return (
-        `<strong>Held here on NNoWWoNN.</strong> Your exact words stay in this thread — not sent to a cloud model on this lane.<br>` +
+        `<strong>Held here on NNoWWoNN.</strong> I don’t know you the way a person would — but I see what you wrote, and it stays in <em>your</em> thread on this shore.<br>` +
+        (snippet ? `<span class="msg-meta">You: “${escHtml(snippet)}${full.length > 120 ? '…' : ''}”</span><br>` : '') +
         `<span class="msg-meta">Moment id: ${record.id} · seal: <code>${sha256.slice(0, 16)}…</code></span><br>` +
         `<button type="button" class="btn btn-secondary hold-save">Save one file (optional)</button><br>` +
-        `Keep typing below. Export, verify, and deeper tools are under <strong>Advanced ▾</strong> when you want them.`
+        `Keep typing below — no Finder unless you tap save.`
       );
     }
 
@@ -339,11 +351,27 @@
         /* */
       }
     }
-    if (openingDraft) {
-      composerInput.value = openingDraft;
-      composerInput.focus();
+    async function holdOpeningDraft(text) {
+      const t = String(text ?? '').trim();
+      if (!t) return;
       document.getElementById('wb-title').textContent = 'Your moment';
-      requestAnimationFrame(() => form.requestSubmit());
+      messages.push({ role: 'user', text: t });
+      renderThread();
+      try {
+        const { record, sha256 } = await captureMoment(t, [], { download: false });
+        messages.push({ role: 'hold', html: holdResponse(record, sha256) });
+        saveThread(messages);
+        renderThread();
+      } catch (err) {
+        messages.push({ role: 'hold', html: `<strong>Could not hold:</strong> ${err.message}` });
+        saveThread(messages);
+        renderThread();
+      }
+      composerInput.focus();
+    }
+
+    if (openingDraft) {
+      holdOpeningDraft(openingDraft);
     } else {
       renderThread();
     }
