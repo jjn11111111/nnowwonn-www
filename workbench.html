@@ -20,6 +20,7 @@
     <div class="wrap wrap-nav">
       <a href="open.html">EnterFace</a>
       <span class="nav-path nav-path-hearth" id="nav-face">Workbench</span>
+      <a href="shall-not.html" class="wb-nav-alt">Gate</a>
       <a href="unpack.html" class="wb-nav-alt">Unpack</a>
       <a href="onboard.html" class="wb-nav-alt">Tour</a>
     </div>
@@ -40,6 +41,20 @@
       <div class="composer-thread" id="thread" aria-live="polite" aria-label="Your moments">
         <p class="thread-empty" id="thread-empty">Your thoughts appear here. This portal has <strong>no NW pipe</strong> to a cloud model — hold stays on your device until you choose another lane.</p>
       </div>
+
+      <fieldset class="composer-lanes" id="composer-lanes" aria-label="Q&A lane · HOST allow">
+        <legend class="composer-lanes-legend">Lane</legend>
+        <div class="composer-lanes-chips">
+          <label class="lane-chip"><input type="radio" name="composer-lane" value="hold" checked /> Hold</label>
+          <label class="lane-chip"><input type="radio" name="composer-lane" value="symbiote" /> Symbiote</label>
+          <label class="lane-chip"><input type="radio" name="composer-lane" value="studio" /> Local Studio</label>
+          <label class="lane-chip"><input type="radio" name="composer-lane" value="witness" /> Witness</label>
+        </div>
+        <p class="composer-lane-hint fine" id="lane-hint">Send holds on this shore only — no remote LLM on this lane.</p>
+        <div class="composer-lane-actions" id="lane-actions" hidden>
+          <button type="button" class="btn btn-secondary" id="btn-lane-action">Continue in lane</button>
+        </div>
+      </fieldset>
 
       <form class="composer-bar" id="composer-form" aria-label="Message input">
         <label class="composer-attach" title="Attach file">
@@ -123,11 +138,18 @@
     import './js/nw-canonical-host.mjs';
     import { registerEnterFaceShell } from './js/nw-enterface-shell.mjs';
     registerEnterFaceShell();
-    import { buildLasherRecordV0, buildMomentExportText, downloadText, loadPariBrowser } from './js/nw-workbench.mjs?v=20261012-8';
+    import { buildLasherRecordV0, buildMomentExportText, downloadText, loadPariBrowser } from './js/nw-workbench.mjs?v=20261012-9';
     import { loadThread, saveThread, slugFromText } from './js/nw-composer-thread.mjs?v=20261012-8';
     import { markStep } from './js/nw-onboard-progress.mjs';
     import { consumeOpeningDraft, FRESH_THREAD_KEY } from './js/nw-opening.mjs?v=20261012-8';
     import { renderFamilySystems } from './js/nw-family-systems.mjs?v=20261012-6';
+    import {
+      LANES,
+      laneHint,
+      symbioteHandoffUrl,
+      studioHandoffUrl,
+      buildWitnessPacket,
+    } from './js/nw-lane-handoff.mjs?v=20261012-9';
 
     const threadEl = document.getElementById('thread');
     const threadEmpty = document.getElementById('thread-empty');
@@ -203,19 +225,101 @@
     function holdResponse(record, sha256) {
       const full = String(record.first_form ?? '');
       const snippet = full.slice(0, 120);
-      const identityQ = /\b(who am i|who i am|know who|know me|do you know|that is me|i am uncle|i'm uncle)\b/i.test(full);
+      const identityQ =
+        /\b(who am i|who i am|know who|know me|do you know|that is me|i am uncle|i'm uncle|this is uncle|uncle jeremy)\b/i.test(
+          full
+        );
       const identityBlock = identityQ
         ? `<strong>On “who am I?”</strong> This shore has no hidden profile of you — no cloud memory, no dossier. What you declare here (e.g. Uncle Jeremy) is <em>your</em> first-form truth in this thread, sealed on your device until you say otherwise.<br>`
         : '';
+      const openAccessQ = /\b(open access|open shore|open source|sovereign device|device sovereignty)\b/i.test(full);
+      const openAccessBlock = openAccessQ
+        ? `<strong>Open shore · sovereign device.</strong> The public lane is inspectable HTML/CSS/JS — no NW chat pipe. Custody stays on your hardware until you export or open another lane. See <a href="unpack.html">Unpack</a> for the PRIME spine.<br>`
+        : '';
       return (
         identityBlock +
+        openAccessBlock +
         `<strong>Held here on NNoWWoNN.</strong> I don’t know you the way a person would — but I see what you wrote, and it stays in <em>your</em> thread on this shore.<br>` +
         (snippet ? `<span class="msg-meta">You: “${escHtml(snippet)}${full.length > 120 ? '…' : ''}”</span><br>` : '') +
         `<span class="msg-meta">Moment id: ${record.id} · seal: <code>${sha256.slice(0, 16)}…</code></span><br>` +
         `<button type="button" class="btn btn-secondary hold-save">Save one file (optional)</button><br>` +
+        `<span class="msg-meta">Q&A: choose Symbiote, Local Studio, or Witness under the composer — Send here still only holds.</span><br>` +
         `Keep typing below — no Finder unless you tap save.`
       );
     }
+
+    const laneHintEl = document.getElementById('lane-hint');
+    const laneActionsEl = document.getElementById('lane-actions');
+    const btnLaneAction = document.getElementById('btn-lane-action');
+    const laneRadios = [...document.querySelectorAll('input[name="composer-lane"]')];
+
+    function selectedLane() {
+      return laneRadios.find((r) => r.checked)?.value ?? LANES.hold;
+    }
+
+    function syncLaneUi() {
+      const lane = selectedLane();
+      if (laneHintEl) laneHintEl.textContent = laneHint(lane);
+      if (laneActionsEl) laneActionsEl.hidden = lane === LANES.hold;
+      if (!btnLaneAction) return;
+      if (lane === LANES.symbiote) btnLaneAction.textContent = 'Open symbiote (new tab) · save moment file';
+      else if (lane === LANES.studio) btnLaneAction.textContent = 'Open Local Studio (new tab) · save moment file';
+      else if (lane === LANES.witness) btnLaneAction.textContent = 'Copy witness packet for Cursor';
+    }
+
+    laneRadios.forEach((r) => r.addEventListener('change', syncLaneUi));
+
+    async function ensureLastMoment() {
+      if (state.lastLasher?.record) return state.lastLasher;
+      const lastUser = [...messages].reverse().find((m) => m.role === 'user');
+      if (!lastUser?.text) throw new Error('Send a message first so we can seal a moment for handoff.');
+      await captureMoment(lastUser.text, lastUser.attachments ?? [], { download: false });
+      if (!state.lastLasher?.record) throw new Error('Could not seal moment for handoff.');
+      return state.lastLasher;
+    }
+
+    btnLaneAction?.addEventListener('click', async () => {
+      const lane = selectedLane();
+      try {
+        if (lane === LANES.hold) return;
+        const ctx = await ensureLastMoment();
+
+        if (lane === LANES.witness) {
+          const text = buildWitnessPacket({ record: ctx.record, sha256: ctx.sha256, messages });
+          await navigator.clipboard.writeText(text);
+          btnLaneAction.textContent = 'Copied — paste in Cursor';
+          messages.push({
+            role: 'hold',
+            html:
+              '<strong>Witness handoff copied.</strong> Open Cursor · new thread · paste packet · SEAT CHECK · Composer 2.5 Fast.<br>' +
+              `<span class="msg-meta">Moment id: ${ctx.record.id}</span>`,
+          });
+          saveThread(messages);
+          renderThread();
+          return;
+        }
+
+        downloadCrystalFile();
+        const url =
+          lane === LANES.symbiote
+            ? symbioteHandoffUrl({ id: ctx.record.id, sha256: ctx.sha256 })
+            : studioHandoffUrl({ id: ctx.record.id, sha256: ctx.sha256 });
+        window.open(url, '_blank', 'noopener,noreferrer');
+        const laneName = lane === LANES.symbiote ? 'PARI symbiote' : 'Local Studio';
+        messages.push({
+          role: 'hold',
+          html:
+            `<strong>${laneName} opened (new tab).</strong> Moment file saved — import there for interactive Q&A.<br>` +
+            `<span class="msg-meta">Moment id: ${ctx.record.id} · seal: <code>${ctx.sha256.slice(0, 16)}…</code></span>`,
+        });
+        saveThread(messages);
+        renderThread();
+      } catch (e) {
+        alert(e.message);
+      }
+    });
+
+    syncLaneUi();
 
     /** @param {{ download?: boolean }} [opts] */
     async function captureMoment(text, attachments, opts = {}) {

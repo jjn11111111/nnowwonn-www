@@ -1,10 +1,11 @@
 /** EnterFace offline shell · static same-origin only · no thread upload */
-const CACHE = 'enterface-shell-v1';
+const CACHE = 'enterface-shell-v4';
 const CORE = [
   '/open.html',
   '/workbench.html',
   '/unpack.html',
   '/cookioe.html',
+  '/shall-not.html',
   '/enter.html',
   '/styles.css',
   '/manifest.webmanifest',
@@ -16,6 +17,7 @@ const CORE = [
   '/js/nw-i18n.mjs',
   '/js/nw-onboard-progress.mjs',
   '/js/nw-enterface-shell.mjs',
+  '/js/nw-lane-handoff.mjs',
 ];
 
 self.addEventListener('install', (event) => {

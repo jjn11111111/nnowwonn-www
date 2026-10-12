@@ -514,6 +514,61 @@ body.composer-has-thread #family-details {
 .msg-meta { font-size: 0.78rem; color: var(--muted); margin-top: 0.35rem; }
 .thread-msg code { font-size: 0.75rem; }
 
+.composer-lanes {
+  margin: 0 0 0.65rem;
+  padding: 0.65rem 0.75rem;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.35);
+}
+.composer-lanes-legend {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--muted);
+  padding: 0 0.25rem;
+}
+.composer-lanes-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 0.35rem;
+}
+.lane-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.78rem;
+  padding: 0.35rem 0.65rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(18, 18, 26, 0.6);
+  cursor: pointer;
+  user-select: none;
+  min-height: 44px;
+}
+.lane-chip:has(input:checked) {
+  border-color: rgba(2, 195, 154, 0.55);
+  background: rgba(2, 195, 154, 0.12);
+  color: var(--gold);
+}
+.lane-chip input {
+  accent-color: var(--teal);
+  margin: 0;
+}
+.composer-lane-hint {
+  margin: 0.5rem 0 0;
+  font-size: 0.78rem;
+  line-height: 1.4;
+}
+.composer-lane-actions {
+  margin-top: 0.55rem;
+}
+.composer-lane-actions .btn {
+  font-size: 0.82rem;
+  padding: 0.5rem 0.85rem;
+}
+
 .composer-bar {
   display: flex;
   align-items: flex-end;
@@ -549,6 +604,15 @@ body.composer-has-thread #family-details {
 }
 .composer-send { flex-shrink: 0; padding: 0.55rem 1.1rem; }
 .composer-hint { font-size: 0.78rem; color: var(--muted); margin: 0.35rem 0 0 0.5rem; }
+
+.shall-not-gate blockquote.shall-not-frog {
+  margin: 1.25rem 0;
+  padding: 0.85rem 1rem;
+  border-left: 3px solid var(--forge-glow);
+  background: rgba(126, 184, 255, 0.06);
+  font-size: 0.92rem;
+}
+.shall-not-list li { margin-bottom: 0.45rem; }
 
 .composer-advanced { margin-top: 1.5rem; }
 .composer-advanced summary {
