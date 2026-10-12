@@ -20,10 +20,10 @@ export async function sha256Hex(text) {
   return [...new Uint8Array(buf)].map((b) => b.toString(16).padStart(2, '0')).join('');
 }
 
-/** @param {{ firstForm: string, slug: string, tier: string, lashTo?: string[], worldlineId?: string|null, shore?: string }} opts */
+/** @param {{ firstForm: string, slug: string, tier: string, lashTo?: string[], worldlineId?: string|null, shore?: string, attachments?: object[] }} opts */
 export async function buildLasherRecordV0(opts) {
   const firstForm = String(opts.firstForm ?? '').trim();
-  if (!firstForm) throw new Error('Present-moment text required.');
+  if (!firstForm && !(opts.attachments?.length)) throw new Error('Type a message or attach a file.');
   const capture = new Date().toISOString();
   const date = capture.slice(0, 10);
   const slug = slugify(opts.slug);
@@ -33,7 +33,8 @@ export async function buildLasherRecordV0(opts) {
     id,
     capture,
     tier: opts.tier || 'B',
-    first_form: firstForm,
+    first_form: firstForm || '(attachment-only capture)',
+    attachments: opts.attachments?.length ? opts.attachments : undefined,
     lash_to: opts.lashTo?.length ? opts.lashTo : ['PortAbleRI-SO-v0', 'NW-Workbench-v0'],
     worldline_id: opts.worldlineId ?? null,
     shore: opts.shore ?? 'nnowwonn.com/workbench.html',

@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="description" content="NOW:WON — begin typing. Your moment held on NNoWWoNN." />
+  <meta name="theme-color" content="#000000" />
+  <title>Begin · NOW:WON</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body class="page-opening">
+  <a class="opening-skip" href="workbench.html">Skip</a>
+
+  <main class="opening-stage" aria-label="Begin typing">
+    <div class="opening-line" id="opening-line">
+      <span class="opening-ghost" id="opening-ghost" aria-hidden="true">Begin…</span>
+      <div
+        class="opening-input"
+        id="opening-input"
+        contenteditable="true"
+        role="textbox"
+        aria-multiline="true"
+        aria-label="Type your first thought"
+        spellcheck="true"
+      ></div>
+      <span class="opening-caret" id="opening-caret" aria-hidden="true"></span>
+    </div>
+    <p class="opening-hint">Press <kbd>Enter</kbd> to continue · <kbd>Shift</kbd>+<kbd>Enter</kbd> for new line</p>
+  </main>
+
+  <footer class="opening-footer">
+    <span class="opening-mark">NNoWWoNN</span>
+    <span class="opening-sub">NOW:WON · hold · verify · yours</span>
+  </footer>
+
+  <script type="module">
+    import { goToWorkbench } from './js/nw-opening.mjs';
+
+    const input = document.getElementById('opening-input');
+    const ghost = document.getElementById('opening-ghost');
+    const caret = document.getElementById('opening-caret');
+
+    function syncGhost() {
+      const empty = !input.textContent.trim();
+      ghost.hidden = !empty;
+      caret.classList.toggle('opening-caret-active', empty || document.activeElement === input);
+    }
+
+    input.addEventListener('input', syncGhost);
+    input.addEventListener('focus', syncGhost);
+    input.addEventListener('blur', () => caret.classList.remove('opening-caret-active'));
+
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        goToWorkbench(input.innerText.trim());
+      }
+    });
+
+    document.body.addEventListener('click', (e) => {
+      if (e.target.closest('.opening-skip')) return;
+      input.focus();
+    });
+
+    syncGhost();
+    requestAnimationFrame(() => input.focus());
+  </script>
+</body>
+</html>
