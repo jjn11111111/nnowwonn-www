@@ -1,5 +1,5 @@
 /** EnterFace offline shell · static same-origin only · no thread upload */
-const CACHE = 'enterface-shell-v4';
+const CACHE = 'enterface-shell-v5';
 const CORE = [
   '/open.html',
   '/workbench.html',
@@ -18,6 +18,7 @@ const CORE = [
   '/js/nw-onboard-progress.mjs',
   '/js/nw-enterface-shell.mjs',
   '/js/nw-lane-handoff.mjs',
+  '/js/nw-moment-import.mjs',
 ];
 
 self.addEventListener('install', (event) => {

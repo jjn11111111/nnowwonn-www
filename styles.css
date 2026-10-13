@@ -511,6 +511,48 @@ body.composer-has-thread #family-details {
   background: rgba(18, 18, 26, 0.95);
   border: 1px solid rgba(249, 231, 149, 0.2);
 }
+.thread-msg-reflect {
+  align-self: flex-start;
+  background: rgba(12, 20, 32, 0.95);
+  border: 1px solid rgba(126, 184, 255, 0.35);
+  max-width: 96%;
+}
+.msg-body-reflect {
+  display: block;
+  margin-top: 0.35rem;
+  line-height: 1.5;
+  white-space: pre-wrap;
+}
+
+.composer-loop {
+  margin-bottom: 0.75rem;
+  padding: 0.85rem 1rem;
+}
+.composer-loop summary {
+  color: var(--gold);
+  font-weight: 600;
+  cursor: pointer;
+}
+.reflect-paste {
+  width: 100%;
+  margin: 0.65rem 0 0;
+  padding: 0.55rem 0.65rem;
+  border-radius: 8px;
+  border: 1px solid rgba(126, 184, 255, 0.25);
+  background: rgba(0, 0, 0, 0.35);
+  color: var(--off);
+  font-family: inherit;
+  font-size: 0.9rem;
+  resize: vertical;
+}
+.composer-loop-actions {
+  margin-top: 0.65rem;
+  margin-bottom: 0;
+}
+.composer-loop-actions .btn {
+  font-size: 0.82rem;
+  padding: 0.5rem 0.85rem;
+}
 .msg-meta { font-size: 0.78rem; color: var(--muted); margin-top: 0.35rem; }
 .thread-msg code { font-size: 0.75rem; }
 

@@ -56,6 +56,27 @@
         </div>
       </fieldset>
 
+      <details class="card composer-loop" id="handoff-loop">
+        <summary>Return from Symbiote or Studio · complete the loop</summary>
+        <p class="fine" id="handoff-loop-lead">
+          After Q&amp;A in another lane: import <code>NW-Moment-Reply-v0</code> or paste the answer here. EnterFace still does not call a cloud model on Send.
+        </p>
+        <p class="fine handoff-pending" id="handoff-pending" hidden></p>
+        <textarea
+          id="reflect-paste"
+          class="reflect-paste"
+          rows="4"
+          placeholder="Paste symbiote or Studio answer…"
+          aria-label="Paste reply from muscle lane"
+        ></textarea>
+        <div class="actions composer-loop-actions">
+          <button type="button" class="btn btn-primary" id="btn-add-reflect">Add reply to thread</button>
+          <button type="button" class="btn btn-secondary" id="btn-import-moment">Import reply file</button>
+          <button type="button" class="btn btn-secondary" id="btn-save-reply-template">Download reply template</button>
+        </div>
+        <input type="file" id="import-moment-file" accept=".json,application/json" hidden />
+      </details>
+
       <form class="composer-bar" id="composer-form" aria-label="Message input">
         <label class="composer-attach" title="Attach file">
           <span class="sr-only">Attach file</span>
@@ -149,7 +170,16 @@
       symbioteHandoffUrl,
       studioHandoffUrl,
       buildWitnessPacket,
-    } from './js/nw-lane-handoff.mjs?v=20261012-9';
+      recordOutboundHandoff,
+      readOutboundHandoff,
+      clearOutboundHandoff,
+    } from './js/nw-lane-handoff.mjs?v=20261012-10';
+    import {
+      parseMomentImport,
+      buildReplyExportText,
+      downloadReplyExport,
+      reflectHtml,
+    } from './js/nw-moment-import.mjs?v=20261012-10';
 
     const threadEl = document.getElementById('thread');
     const threadEmpty = document.getElementById('thread-empty');
@@ -207,6 +237,8 @@
         if (m.role === 'user') {
           div.innerHTML = `<p class="msg-body"></p>${m.attachments?.length ? `<p class="msg-meta">${m.attachments.map((a) => a.name).join(', ')}</p>` : ''}`;
           div.querySelector('.msg-body').textContent = m.text;
+        } else if (m.role === 'reflect') {
+          div.innerHTML = `<p class="msg-body">${m.html ?? reflectHtml(m.lane ?? 'studio', m.text ?? '', m.parentId)}</p>`;
         } else {
           div.innerHTML = `<p class="msg-body">${m.html}</p>`;
         }
@@ -300,26 +332,126 @@
         }
 
         downloadCrystalFile();
+        recordOutboundHandoff({ lane, record: ctx.record, sha256: ctx.sha256 });
         const url =
           lane === LANES.symbiote
-            ? symbioteHandoffUrl({ id: ctx.record.id, sha256: ctx.sha256 })
-            : studioHandoffUrl({ id: ctx.record.id, sha256: ctx.sha256 });
+            ? symbioteHandoffUrl({ id: ctx.record.id, sha256: ctx.sha256, lane: 'symbiote' })
+            : studioHandoffUrl({ id: ctx.record.id, sha256: ctx.sha256, lane: 'studio' });
         window.open(url, '_blank', 'noopener,noreferrer');
         const laneName = lane === LANES.symbiote ? 'PARI symbiote' : 'Local Studio';
         messages.push({
           role: 'hold',
           html:
-            `<strong>${laneName} opened (new tab).</strong> Moment file saved — import there for interactive Q&A.<br>` +
+            `<strong>${laneName} opened (new tab).</strong> Moment file saved — Q&amp;A there, then <strong>complete the loop</strong> below (paste or import reply).<br>` +
             `<span class="msg-meta">Moment id: ${ctx.record.id} · seal: <code>${ctx.sha256.slice(0, 16)}…</code></span>`,
         });
         saveThread(messages);
         renderThread();
+        syncHandoffLoopUi();
+        document.getElementById('handoff-loop')?.setAttribute('open', '');
       } catch (e) {
         alert(e.message);
       }
     });
 
     syncLaneUi();
+
+    const handoffLoop = document.getElementById('handoff-loop');
+    const handoffPending = document.getElementById('handoff-pending');
+    const reflectPaste = document.getElementById('reflect-paste');
+    const importMomentFile = document.getElementById('import-moment-file');
+
+    function syncHandoffLoopUi() {
+      const pending = readOutboundHandoff();
+      if (!handoffPending) return;
+      if (pending?.record?.id) {
+        handoffPending.hidden = false;
+        handoffPending.textContent = `Open handoff: ${pending.record.id} (${pending.lane ?? 'lane'}) · waiting for reply import.`;
+      } else {
+        handoffPending.hidden = true;
+      }
+    }
+
+    function addReflectToThread(text, lane, parentId) {
+      const t = String(text ?? '').trim();
+      if (!t) throw new Error('Paste or import a reply first.');
+      messages.push({
+        role: 'reflect',
+        text: t,
+        lane: lane ?? 'studio',
+        parentId: parentId ?? state.lastLasher?.record?.id ?? null,
+        html: reflectHtml(lane ?? 'studio', t, parentId ?? state.lastLasher?.record?.id ?? null),
+      });
+      saveThread(messages);
+      renderThread();
+      clearOutboundHandoff();
+      syncHandoffLoopUi();
+      if (reflectPaste) reflectPaste.value = '';
+    }
+
+    document.getElementById('btn-add-reflect')?.addEventListener('click', () => {
+      try {
+        const pending = readOutboundHandoff();
+        addReflectToThread(reflectPaste?.value ?? '', pending?.lane ?? 'studio', pending?.record?.id);
+      } catch (e) {
+        alert(e.message);
+      }
+    });
+
+    document.getElementById('btn-import-moment')?.addEventListener('click', () => importMomentFile?.click());
+
+    importMomentFile?.addEventListener('change', async (ev) => {
+      const file = ev.target.files?.[0];
+      ev.target.value = '';
+      if (!file) return;
+      try {
+        const parsed = parseMomentImport(await file.text());
+        if (parsed.kind === 'reply') {
+          addReflectToThread(parsed.text, parsed.lane, parsed.parentId);
+        } else {
+          state.lastLasher = {
+            record: parsed.record,
+            sha256: parsed.sha256,
+            exportText: null,
+            filename: `${parsed.record.id}.json`,
+          };
+          messages.push({
+            role: 'hold',
+            html:
+              `<strong>Moment imported.</strong> Verified on device — continue thread or open a lane.<br>` +
+              `<span class="msg-meta">Moment id: ${parsed.record.id}</span>`,
+          });
+          saveThread(messages);
+          renderThread();
+        }
+      } catch (e) {
+        alert(e.message);
+      }
+    });
+
+    document.getElementById('btn-save-reply-template')?.addEventListener('click', () => {
+      const pending = readOutboundHandoff();
+      const parentId = pending?.record?.id ?? state.lastLasher?.record?.id;
+      if (!parentId) {
+        alert('Send a message or open a lane first so we have a parent moment id.');
+        return;
+      }
+      const draft = reflectPaste?.value?.trim() ?? '';
+      downloadReplyExport(
+        buildReplyExportText({
+          parentId,
+          lane: pending?.lane ?? selectedLane(),
+          replyText: draft || '(paste symbiote or Studio answer here, then re-import)',
+        })
+      );
+      recordOutboundHandoff(
+        pending ?? {
+          lane: selectedLane(),
+          record: state.lastLasher.record,
+          sha256: state.lastLasher.sha256,
+        }
+      );
+    });
 
     /** @param {{ download?: boolean }} [opts] */
     async function captureMoment(text, attachments, opts = {}) {
@@ -497,6 +629,17 @@
       openingDraft = params.get('q') || '';
     }
     if (params.has('q')) stripQueryFromUrl();
+
+    if (params.get('handoff') === '1') {
+      handoffLoop?.setAttribute('open', '');
+      const laneParam = params.get('lane');
+      if (laneParam && laneRadios.some((r) => r.value === laneParam)) {
+        laneRadios.find((r) => r.value === laneParam).checked = true;
+        syncLaneUi();
+      }
+      stripQueryFromUrl();
+    }
+    syncHandoffLoopUi();
 
     try {
       if (sessionStorage.getItem(FRESH_THREAD_KEY)) {

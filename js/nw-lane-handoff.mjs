@@ -13,23 +13,79 @@ export const LANES = /** @type {const} */ ({
 const SYMBIOTE_BASE = 'https://portableri.com/onboarding.html?begin=1&from=enterface';
 const STUDIO_BASE = 'https://portableri.com/studio.html?shore=nnowwonn&from=enterface';
 
+export const OUTBOUND_HANDOFF_KEY = 'nw-outbound-handoff-v1';
+
+/** @param {string} lane */
+export function workbenchReturnUrl(lane) {
+  const origin =
+    typeof location !== 'undefined' && /nnowwonn|localhost|127\.0\.0\.1/.test(location.hostname)
+      ? location.origin
+      : 'https://www.nnowwonn.com';
+  const u = new URL('workbench.html', `${origin}/`);
+  u.searchParams.set('handoff', '1');
+  u.searchParams.set('lane', lane);
+  return u.href;
+}
+
 /**
- * @param {{ id?: string, sha256?: string }} ctx
+ * @param {{ lane: string, record: object, sha256: string }} payload
+ */
+export function recordOutboundHandoff(payload) {
+  try {
+    sessionStorage.setItem(
+      OUTBOUND_HANDOFF_KEY,
+      JSON.stringify({
+        ...payload,
+        at: new Date().toISOString(),
+      })
+    );
+  } catch {
+    /* private mode */
+  }
+}
+
+export function readOutboundHandoff() {
+  try {
+    const raw = sessionStorage.getItem(OUTBOUND_HANDOFF_KEY);
+    if (!raw) return null;
+    return JSON.parse(raw);
+  } catch {
+    return null;
+  }
+}
+
+/** @deprecated use readOutboundHandoff */
+export function consumeOutboundHandoff() {
+  return readOutboundHandoff();
+}
+
+export function clearOutboundHandoff() {
+  try {
+    sessionStorage.removeItem(OUTBOUND_HANDOFF_KEY);
+  } catch {
+    /* */
+  }
+}
+
+/**
+ * @param {{ id?: string, sha256?: string, lane?: string }} ctx
  */
 export function symbioteHandoffUrl(ctx = {}) {
   const u = new URL(SYMBIOTE_BASE);
   if (ctx.id) u.searchParams.set('moment', ctx.id);
   if (ctx.sha256) u.searchParams.set('seal', ctx.sha256.slice(0, 16));
+  u.searchParams.set('return', workbenchReturnUrl(ctx.lane ?? 'symbiote'));
   return u.href;
 }
 
 /**
- * @param {{ id?: string, sha256?: string }} ctx
+ * @param {{ id?: string, sha256?: string, lane?: string }} ctx
  */
 export function studioHandoffUrl(ctx = {}) {
   const u = new URL(STUDIO_BASE);
   if (ctx.id) u.searchParams.set('moment', ctx.id);
   if (ctx.sha256) u.searchParams.set('seal', ctx.sha256.slice(0, 16));
+  u.searchParams.set('return', workbenchReturnUrl(ctx.lane ?? 'studio'));
   return u.href;
 }
 
@@ -79,9 +135,9 @@ Continue interactive Q&A in the Witness seat. NW EnterFace lane held this moment
 export function laneHint(lane) {
   switch (lane) {
     case LANES.symbiote:
-      return 'PARI symbiote opens in a new tab. We save one moment file first (HOST allow), then you import in symbiote onboarding.';
+      return 'Symbiote opens in a new tab · moment file saves first · return link brings you back to complete the loop (import reply file or paste).';
     case LANES.studio:
-      return 'Full Studio on your Mac (local bench · optional Ollama). Moment file downloads first; import in Studio.';
+      return 'Studio on your Mac · moment file saves first · use “Return from Studio” below to import answer — still no NW chat pipe on Send.';
     case LANES.witness:
       return 'Copies a witness packet for Cursor · CurseCom. Paste as your first message — interactive seat, not this web page.';
     default:
