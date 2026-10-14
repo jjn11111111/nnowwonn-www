@@ -12,6 +12,16 @@ export const LANES = /** @type {const} */ ({
 
 const SYMBIOTE_BASE = 'https://portableri.com/onboarding.html?begin=1&from=enterface';
 const STUDIO_BASE = 'https://portableri.com/studio.html?shore=nnowwonn&from=enterface';
+const LOCAL_STUDIO_BASE = 'http://127.0.0.1:8877/studio.html?shore=nnowwonn&from=enterface';
+
+/** NW on localhost can hand off to LOCAL FIELD on 8877 (EnterFaceRI chessboard). */
+export function isLocalNwHost() {
+  return typeof location !== 'undefined' && /localhost|127\.0\.0\.1/.test(location.hostname);
+}
+
+export function localStudioUrl() {
+  return LOCAL_STUDIO_BASE;
+}
 
 export const OUTBOUND_HANDOFF_KEY = 'nw-outbound-handoff-v1';
 
@@ -82,7 +92,8 @@ export function symbioteHandoffUrl(ctx = {}) {
  * @param {{ id?: string, sha256?: string, lane?: string }} ctx
  */
 export function studioHandoffUrl(ctx = {}) {
-  const u = new URL(STUDIO_BASE);
+  const base = isLocalNwHost() ? LOCAL_STUDIO_BASE : STUDIO_BASE;
+  const u = new URL(base);
   if (ctx.id) u.searchParams.set('moment', ctx.id);
   if (ctx.sha256) u.searchParams.set('seal', ctx.sha256.slice(0, 16));
   u.searchParams.set('return', workbenchReturnUrl(ctx.lane ?? 'studio'));
