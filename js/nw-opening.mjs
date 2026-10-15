@@ -21,7 +21,7 @@ export function consumeOpeningDraft() {
   }
 }
 
-const CANON_ORIGIN = 'https://www.nnowwonn.com';
+import { canonOrigin } from './nw-shore-origin.mjs';
 
 export function goToWorkbench(text) {
   const t = String(text ?? '').trim();
@@ -31,7 +31,7 @@ export function goToWorkbench(text) {
   } catch {
     /* */
   }
-  const url = new URL('workbench.html', `${CANON_ORIGIN}/`);
+  const url = new URL('workbench.html', `${canonOrigin()}/`);
   if (t) url.searchParams.set('q', t.slice(0, 2000));
   location.href = url.href;
 }

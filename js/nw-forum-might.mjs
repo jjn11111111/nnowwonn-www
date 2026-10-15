@@ -1,6 +1,8 @@
 /**
  * Lane A + C · Forum ↔ Might ↔ Studio · localhost only
  */
+import { shoreQueryTag } from './nw-shore-origin.mjs';
+
 export const KAIRIS_MIGHT_URL = 'http://127.0.0.1:8799';
 export const LOCAL_STUDIO = 'http://127.0.0.1:8877/studio.html';
 
@@ -30,7 +32,7 @@ export async function mightStoreMoment(id, envelope) {
 /** @param {{ recordId: string, seal: string }} opts */
 export function studioHandoffUrl(opts) {
   const u = new URL(LOCAL_STUDIO);
-  u.searchParams.set('shore', 'nnowwonn');
+  u.searchParams.set('shore', shoreQueryTag());
   u.searchParams.set('from', 'forum');
   u.searchParams.set('moment', opts.recordId);
   if (opts.seal) u.searchParams.set('seal', opts.seal.slice(0, 16));

@@ -2,6 +2,8 @@
  * EnterFace · moment / reply import · closes Symbiote / Studio loop on NW (no pipe).
  */
 
+import { shorePath } from './nw-shore-origin.mjs';
+
 /** @param {string} raw */
 export function parseMomentImport(raw) {
   let data;
@@ -48,7 +50,7 @@ export function buildReplyExportText(opts) {
     parent_moment_id: opts.parentId,
     lane: opts.lane,
     reply_text: String(opts.replyText ?? '').trim(),
-    shore: 'nnowwonn.com/workbench.html',
+    shore: shorePath('workbench.html'),
   };
   return JSON.stringify(body, null, 2);
 }

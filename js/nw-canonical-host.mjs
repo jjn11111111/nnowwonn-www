@@ -1,10 +1,11 @@
-/** Always use GitHub Pages host (avoids apex / stale redirect split). */
-const CANON = 'www.nnowwonn.com';
+import { apexForHost, canonWww } from './nw-shore-origin.mjs';
 
 export function ensureCanonicalHost() {
-  if (location.hostname === CANON) return;
-  if (!location.hostname.endsWith('nnowwonn.com')) return;
-  const target = `https://${CANON}${location.pathname}${location.search}${location.hash}`;
+  const www = canonWww();
+  if (location.hostname === www) return;
+  const apex = apexForHost();
+  if (!apex) return;
+  const target = `https://${www}${location.pathname}${location.search}${location.hash}`;
   location.replace(target);
 }
 

@@ -3,6 +3,8 @@
  * No symbiote · no Ollama required for lasher lane.
  */
 
+import { shorePath } from './nw-shore-origin.mjs';
+
 const PARI_BROWSER = 'https://portableri.com/js/portableri-core/browser/index.mjs';
 
 export function slugify(s) {
@@ -42,7 +44,7 @@ export async function buildLasherRecordV0(opts) {
     attachments: opts.attachments?.length ? opts.attachments : undefined,
     lash_to: opts.lashTo?.length ? opts.lashTo : ['PortAbleRI-SO-v0', 'NW-Workbench-v0'],
     worldline_id: opts.worldlineId ?? null,
-    shore: opts.shore ?? 'nnowwonn.com/workbench.html',
+    shore: opts.shore ?? shorePath('workbench.html'),
     public: false,
     law: 'P ≠ K ≠ R · record floor stays R',
   };

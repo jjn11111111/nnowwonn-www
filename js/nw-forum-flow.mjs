@@ -8,6 +8,7 @@ import { runFilingMotionPipeline } from './nw-filing-motion.mjs';
 import { wireComposerIntent } from './nw-composer-intent.mjs';
 import { parseMomentImport } from './nw-moment-import.mjs';
 import { markCustodyByKey, notifyCustodyChanged, syncCustodyFromDevice } from './nw-user-custody.mjs';
+import { shorePath } from './nw-shore-origin.mjs';
 
 const PHASE_MS = 420;
 const THREAD_KEY = 'nw-forum-thread-v2';
@@ -193,7 +194,7 @@ export async function runForumFlow(opts) {
     slug: query.slice(0, 48),
     tier: 'B',
     lashTo: ['NW-Forum-v0'],
-    shore: 'nnowwonn.com/forum.html',
+    shore: shorePath('forum.html'),
   };
 
   if (stage) stage.hidden = false;

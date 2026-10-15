@@ -1,5 +1,5 @@
 /** EnterFace offline shell · static same-origin only · no thread upload */
-const CACHE = 'enterface-shell-v19';
+const CACHE = 'enterface-shell-v20';
 const CORE = [
   '/open.html',
   '/forum.html',
@@ -12,6 +12,7 @@ const CORE = [
   '/styles.css',
   '/manifest.webmanifest',
   '/js/nw-canonical-host.mjs',
+  '/js/nw-shore-origin.mjs',
   '/js/nw-opening.mjs',
   '/js/nw-workbench.mjs',
   '/js/nw-composer-thread.mjs',

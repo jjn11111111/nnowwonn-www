@@ -3,6 +3,8 @@
  * Symbiote / Studio = new tab + optional moment file. Witness = clipboard packet for Cursor.
  */
 
+import { canonOrigin, shorePath, shoreQueryTag } from './nw-shore-origin.mjs';
+
 export const LANES = /** @type {const} */ ({
   hold: 'hold',
   symbiote: 'symbiote',
@@ -11,8 +13,13 @@ export const LANES = /** @type {const} */ ({
 });
 
 const SYMBIOTE_BASE = 'https://portableri.com/onboarding.html?begin=1&from=enterface';
-const STUDIO_BASE = 'https://portableri.com/studio.html?shore=nnowwonn&from=enterface';
-const LOCAL_STUDIO_BASE = 'http://127.0.0.1:8877/studio.html?shore=nnowwonn&from=enterface';
+
+function studioBase() {
+  return `https://portableri.com/studio.html?shore=${shoreQueryTag()}&from=enterface`;
+}
+function localStudioBase() {
+  return `http://127.0.0.1:8877/studio.html?shore=${shoreQueryTag()}&from=enterface`;
+}
 
 /** NW on localhost can hand off to LOCAL FIELD on 8877 (EnterFaceRI chessboard). */
 export function isLocalNwHost() {
@@ -20,7 +27,7 @@ export function isLocalNwHost() {
 }
 
 export function localStudioUrl() {
-  return LOCAL_STUDIO_BASE;
+  return localStudioBase();
 }
 
 export const OUTBOUND_HANDOFF_KEY = 'nw-outbound-handoff-v1';
@@ -28,9 +35,10 @@ export const OUTBOUND_HANDOFF_KEY = 'nw-outbound-handoff-v1';
 /** @param {string} lane */
 export function workbenchReturnUrl(lane) {
   const origin =
-    typeof location !== 'undefined' && /nnowwonn|localhost|127\.0\.0\.1/.test(location.hostname)
+    typeof location !== 'undefined' &&
+    (location.protocol === 'http:' || location.protocol === 'https:')
       ? location.origin
-      : 'https://www.nnowwonn.com';
+      : canonOrigin();
   const u = new URL('workbench.html', `${origin}/`);
   u.searchParams.set('handoff', '1');
   u.searchParams.set('lane', lane);
@@ -92,7 +100,7 @@ export function symbioteHandoffUrl(ctx = {}) {
  * @param {{ id?: string, sha256?: string, lane?: string }} ctx
  */
 export function studioHandoffUrl(ctx = {}) {
-  const base = isLocalNwHost() ? LOCAL_STUDIO_BASE : STUDIO_BASE;
+  const base = isLocalNwHost() ? localStudioBase() : studioBase();
   const u = new URL(base);
   if (ctx.id) u.searchParams.set('moment', ctx.id);
   if (ctx.sha256) u.searchParams.set('seal', ctx.sha256.slice(0, 16));
@@ -127,7 +135,7 @@ Paste this into a **Cursor** thread (Witness seat). This is not web chat on NW.
 - **id:** \`${record.id}\`
 - **sha256:** \`${sha256}\`
 - **capture:** ${record.capture ?? '—'}
-- **shore:** ${record.shore ?? 'nnowwonn.com/workbench.html'}
+- **shore:** ${record.shore ?? shorePath('workbench.html')}
 
 ## First form (earliest user-visible)
 ${record.first_form ?? ''}
