@@ -1,7 +1,9 @@
 /** EnterFace offline shell · static same-origin only · no thread upload */
-const CACHE = 'enterface-shell-v5';
+const CACHE = 'enterface-shell-v19';
 const CORE = [
   '/open.html',
+  '/forum.html',
+  '/memory-core.html',
   '/workbench.html',
   '/unpack.html',
   '/cookioe.html',
@@ -17,8 +19,17 @@ const CORE = [
   '/js/nw-i18n.mjs',
   '/js/nw-onboard-progress.mjs',
   '/js/nw-enterface-shell.mjs',
+  '/js/nw-face-summon.mjs',
   '/js/nw-lane-handoff.mjs',
   '/js/nw-moment-import.mjs',
+  '/js/nw-forum-flow.mjs',
+  '/js/nw-forum-might.mjs',
+  '/js/nw-memory-core.mjs',
+  '/js/nw-filing-tree.mjs',
+  '/js/nw-filing-motion.mjs',
+  '/js/nw-composer-intent.mjs',
+  '/js/nw-enterface-attributes.mjs',
+  '/js/nw-user-custody.mjs',
 ];
 
 self.addEventListener('install', (event) => {
@@ -43,7 +54,7 @@ self.addEventListener('fetch', (event) => {
   event.respondWith(
     fetch(event.request)
       .then((res) => {
-        if (res.ok && url.pathname.match(/\.(css|js|html|webmanifest)$/)) {
+        if (res.ok && url.pathname.match(/\.(css|html|webmanifest)$/) && !url.pathname.endsWith('.mjs')) {
           const clone = res.clone();
           caches.open(CACHE).then((c) => c.put(event.request, clone));
         }

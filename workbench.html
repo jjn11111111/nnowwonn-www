@@ -16,6 +16,10 @@
 </head>
 <body class="page-workbench page-composer page-enterface" data-enterface="thread" data-face="hearth">
   <a class="skip-link" href="#composer-input">Skip to message</a>
+  <p class="enterface-face-mark" id="enterface-face-claim">
+    ReClaim <span class="opening-face-you">YOU</span>r Face · EnterFaceRI
+  </p>
+  <div class="enterface-face-layer">
   <nav class="top enterface-nav" aria-label="EnterFace">
     <div class="wrap wrap-nav">
       <a href="open.html">EnterFace</a>
@@ -134,7 +138,8 @@
         <div class="card local-reflect-note">
           <h3 class="wb-substep">Local reflect (layer L4)</h3>
           <p class="fine">
-            EnterFace on <strong>www</strong> has <strong>no cloud chat pipe</strong>. Browsers block HTTPS sites from calling
+            EnterFace on <strong>www</strong> has <strong>no cloud chat pipe</strong> — <strong>SVess</strong> (time · RAM · energy · egress saves).
+            Browsers block HTTPS sites from calling
             <code>127.0.0.1</code> Ollama directly. For AI muscle: run
             <a href="https://portableri.com/studio.html?shore=nnowwonn" target="_blank" rel="noopener noreferrer">Studio on your Mac</a>
             or read <a href="unpack.html">Unpack · L4</a>.
@@ -155,11 +160,26 @@
       </details>
     </div>
   </main>
+  </div>
 
   <script type="module">
     import './js/nw-canonical-host.mjs';
     import { registerEnterFaceShell } from './js/nw-enterface-shell.mjs';
+    import { runEnterFaceSummon } from './js/nw-face-summon.mjs';
+    import { mountMemoryCoreField } from './js/nw-memory-core.mjs?v=17';
+    import { wireComposerIntent } from './js/nw-composer-intent.mjs?v=17';
+    import { runFilingMotionPipeline } from './js/nw-filing-motion.mjs?v=17';
+    import { markCustodyByKey, notifyCustodyChanged } from './js/nw-user-custody.mjs?v=17';
     registerEnterFaceShell();
+    mountMemoryCoreField(document.querySelector('.enterface-face-layer'));
+    try {
+      if (sessionStorage.getItem('enterface-face-summon-v1') !== '1') {
+        runEnterFaceSummon({ mode: 'hearth' });
+        sessionStorage.setItem('enterface-face-summon-v1', '1');
+      }
+    } catch {
+      runEnterFaceSummon({ mode: 'hearth' });
+    }
     import { buildLasherRecordV0, buildMomentExportText, downloadText, loadPariBrowser } from './js/nw-workbench.mjs?v=20261012-9';
     import { loadThread, saveThread, slugFromText } from './js/nw-composer-thread.mjs?v=20261012-8';
     import { markStep } from './js/nw-onboard-progress.mjs';
@@ -185,6 +205,7 @@
     const threadEl = document.getElementById('thread');
     const threadEmpty = document.getElementById('thread-empty');
     const composerInput = document.getElementById('composer-input');
+    wireComposerIntent(composerInput);
     const composerFile = document.getElementById('composer-file');
     const attachHint = document.getElementById('attach-hint');
     const form = document.getElementById('composer-form');
@@ -517,7 +538,10 @@
       attachHint.textContent = '';
 
       try {
-        const { record, sha256 } = await captureMoment(text, attachments);
+        const { record, sha256 } = await runFilingMotionPipeline(() => captureMoment(text, attachments));
+        markCustodyByKey('front', 'workbench', { hint: text.slice(0, 40) || 'hold' });
+        markCustodyByKey('front', 'export', { hint: record.id.slice(0, 28) });
+        notifyCustodyChanged();
         messages.push({ role: 'hold', html: holdResponse(record, sha256) });
         saveThread(messages);
         renderThread();
