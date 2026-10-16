@@ -20,7 +20,7 @@
   <div class="enterface-face-layer forum-chat-layer">
     <header class="forum-chat-header">
       <nav class="forum-chat-nav" aria-label="Site">
-        <a href="open.html">EnterFace</a>
+        <a href="open.html" data-brand-nav-enter>EnterFace</a>
         <span class="forum-chat-title">Forum</span>
         <span class="forum-chat-spacer"></span>
         <button type="button" class="forum-chat-tool" id="forum-import-reply" title="Import NW-Moment-Reply-v0 from Studio (no pipe)">Reply</button>
@@ -72,7 +72,9 @@
 
   <script type="module">
     import './js/nw-canonical-host.mjs';
+    import { applyShoreBrand } from './js/nw-shore-brand.mjs';
     import { registerEnterFaceShell } from './js/nw-enterface-shell.mjs';
+    applyShoreBrand({ page: 'generic' });
     import { runEnterFaceSummon } from './js/nw-face-summon.mjs';
     import { wireForumChat } from './js/nw-forum-flow.mjs?v=19';
     import { mountMemoryCoreField } from './js/nw-memory-core.mjs?v=19';

@@ -56,3 +56,41 @@ export function shoreQueryTag() {
   if (apex === 'nnowwonn.com') return 'nnowwonn';
   return 'enterfaceri';
 }
+
+/** EnterFaceRI product URL vs NOW:WON brand URL (same static shore). */
+export function isProductShoreHost() {
+  const apex = apexForHost();
+  if (!apex) return true;
+  return apex === 'enterfaceri.com';
+}
+
+/** Other public host · same bench · no cross-redirect. */
+export function siblingShoreHome() {
+  const apex = apexForHost();
+  if (apex === 'nnowwonn.com') return 'https://www.enterfaceri.com/';
+  if (apex === 'enterfaceri.com') return 'https://www.nnowwonn.com/';
+  return 'https://www.nnowwonn.com/';
+}
+
+export function portableriStudioHref(extra = {}) {
+  const u = new URL('https://portableri.com/studio.html');
+  u.searchParams.set('shore', shoreQueryTag());
+  u.searchParams.set('from', 'enterface');
+  for (const [k, v] of Object.entries(extra)) {
+    if (v != null && v !== '') u.searchParams.set(k, String(v));
+  }
+  return u.href;
+}
+
+export function portableriPageHref(page, extra = {}) {
+  const u = new URL(page, 'https://portableri.com/');
+  u.searchParams.set('from', shoreQueryTag());
+  for (const [k, v] of Object.entries(extra)) {
+    if (v != null && v !== '') u.searchParams.set(k, String(v));
+  }
+  return u.href;
+}
+
+export function localStudio8877Href() {
+  return `http://127.0.0.1:8877/studio.html?shore=${shoreQueryTag()}&from=enterface`;
+}

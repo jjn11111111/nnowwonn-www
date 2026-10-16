@@ -43,14 +43,16 @@
   </main>
 
   <footer class="opening-footer">
-    <span class="opening-mark">NNoWWoNN</span>
-    <span class="opening-sub">EnterFace · NOW:WON · <a href="forum.html" class="opening-cookioe">Forum</a> · <a href="unpack.html#enterface-attributes" class="opening-cookioe">Say both</a> · <a href="shall-not.html" class="opening-cookioe">YOU SHALL NOT PASS</a> · <a href="cookioe.html" class="opening-cookioe">Cookioe</a> · yours</span>
+    <span class="opening-mark" data-brand-opening-mark>NNoWWoNN</span>
+    <span class="opening-sub" data-brand-opening-sub>EnterFace · NOW:WON · <a href="forum.html" class="opening-cookioe">Forum</a> · <a href="unpack.html#enterface-attributes" class="opening-cookioe">Say both</a> · <a href="shall-not.html" class="opening-cookioe">YOU SHALL NOT PASS</a> · <a href="cookioe.html" class="opening-cookioe">Cookioe</a> · yours</span>
   </footer>
   </div>
 
   <script type="module">
     import './js/nw-canonical-host.mjs';
+    import { applyShoreBrand } from './js/nw-shore-brand.mjs';
     import { registerEnterFaceShell } from './js/nw-enterface-shell.mjs';
+    applyShoreBrand({ page: 'opening' });
     import { runEnterFaceSummon } from './js/nw-face-summon.mjs';
     import { goToWorkbench } from './js/nw-opening.mjs';
     registerEnterFaceShell();

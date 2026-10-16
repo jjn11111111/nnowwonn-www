@@ -702,6 +702,11 @@ body.composer-has-thread #family-details {
   border: 0;
 }
 
+.shore-sibling-link {
+  margin-top: 1rem;
+  opacity: 0.92;
+}
+
 /* —— EnterFaceRI · holo substrate (max sat · black field) —— */
 body.page-opening,
 body.page-enterface.page-composer {

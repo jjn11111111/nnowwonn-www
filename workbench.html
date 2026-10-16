@@ -22,7 +22,7 @@
   <div class="enterface-face-layer">
   <nav class="top enterface-nav" aria-label="EnterFace">
     <div class="wrap wrap-nav">
-      <a href="open.html">EnterFace</a>
+      <a href="open.html" data-brand-nav-enter>EnterFace</a>
       <span class="nav-path nav-path-hearth" id="nav-face">Workbench</span>
       <a href="shall-not.html" class="wb-nav-alt">Gate</a>
       <a href="unpack.html" class="wb-nav-alt">Unpack</a>
@@ -32,8 +32,8 @@
 
   <header class="hero hero-wb hero-compact">
     <div class="wrap">
-      <h1 id="wb-title">EnterFace Workbench</h1>
-      <p class="lead" id="wb-lead">
+      <h1 id="wb-title" data-brand-workbench-title>EnterFace Workbench</h1>
+      <p class="lead" id="wb-lead" data-brand-workbench-lead>
         One thread for <strong>you</strong> — gateway to the <strong>KaiRis family</strong> of systems (NOW:WON · PortAbleRI · verify · library · witness).
         Hold here first; open other lanes only when you choose.
       </p>
@@ -141,14 +141,14 @@
             EnterFace on <strong>www</strong> has <strong>no cloud chat pipe</strong> — <strong>SVess</strong> (time · RAM · energy · egress saves).
             Browsers block HTTPS sites from calling
             <code>127.0.0.1</code> Ollama directly. For AI muscle: run
-            <a href="https://portableri.com/studio.html?shore=nnowwonn" target="_blank" rel="noopener noreferrer">Studio on your Mac</a>
+            <a href="https://portableri.com/studio.html" data-shore-link="portableri-studio" target="_blank" rel="noopener noreferrer">Studio on your Mac</a>
             or read <a href="unpack.html">Unpack · L4</a>.
           </p>
         </div>
         <ul class="wb-links">
-          <li><a href="http://127.0.0.1:8877/studio.html?shore=nnowwonn&amp;from=enterface" target="_blank" rel="noopener noreferrer">EnterFaceRI · LOCAL Studio @ 8877 (new tab)</a></li>
-          <li><a href="https://portableri.com/studio.html?shore=nnowwonn" target="_blank" rel="noopener noreferrer">Studio on portableri.com (new tab)</a></li>
-          <li><a href="https://portableri.com/start.html?from=nnowwonn" target="_blank" rel="noopener noreferrer">PortAbleRI symbiote path (new tab)</a></li>
+          <li><a href="http://127.0.0.1:8877/studio.html" data-shore-link="local-studio-8877" target="_blank" rel="noopener noreferrer">EnterFaceRI · LOCAL Studio @ 8877 (new tab)</a></li>
+          <li><a href="https://portableri.com/studio.html" data-shore-link="portableri-studio" target="_blank" rel="noopener noreferrer">Studio on portableri.com (new tab)</a></li>
+          <li><a href="https://portableri.com/start.html" data-shore-link="portableri-start" target="_blank" rel="noopener noreferrer">PortAbleRI symbiote path (new tab)</a></li>
           <li><a href="unpack.html">Architecture unpack (L0–L5)</a></li>
         </ul>
       </details>
@@ -164,7 +164,9 @@
 
   <script type="module">
     import './js/nw-canonical-host.mjs';
+    import { applyShoreBrand } from './js/nw-shore-brand.mjs';
     import { registerEnterFaceShell } from './js/nw-enterface-shell.mjs';
+    applyShoreBrand({ page: 'workbench' });
     import { runEnterFaceSummon } from './js/nw-face-summon.mjs';
     import { mountMemoryCoreField } from './js/nw-memory-core.mjs?v=17';
     import { wireComposerIntent } from './js/nw-composer-intent.mjs?v=17';

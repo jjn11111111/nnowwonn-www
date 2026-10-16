@@ -13,7 +13,7 @@
   <a class="skip-link" href="#unpack-main">Skip to content</a>
   <nav class="top enterface-nav" aria-label="EnterFace">
     <div class="wrap wrap-nav">
-      <a href="open.html">EnterFace</a>
+      <a href="open.html" data-brand-nav-enter>EnterFace</a>
       <span class="nav-path nav-path-hearth">Unpack</span>
       <a href="workbench.html" class="wb-nav-alt">Workbench</a>
     </div>
@@ -65,7 +65,7 @@
       <li class="card unpack-layer">
         <span class="unpack-layer-id">L4</span>
         <h2>PARI · local muscle</h2>
-        <p><a href="https://portableri.com/studio.html?shore=nnowwonn" target="_blank" rel="noopener noreferrer">Studio</a> on your Mac · optional Ollama at <code>127.0.0.1</code>. Browsers block HTTPS→localhost; deep AI runs on the <strong>local bench</strong>, not the viral NW pipe.</p>
+        <p><a href="https://portableri.com/studio.html" data-shore-link="portableri-studio" target="_blank" rel="noopener noreferrer">Studio</a> on your Mac · optional Ollama at <code>127.0.0.1</code>. Browsers block HTTPS→localhost; deep AI runs on the <strong>local bench</strong>, not the viral NW pipe.</p>
       </li>
       <li class="card unpack-layer">
         <span class="unpack-layer-id">L5</span>
@@ -94,7 +94,9 @@
 
   <script type="module">
     import './js/nw-canonical-host.mjs';
+    import { applyShoreBrand } from './js/nw-shore-brand.mjs';
     import { registerEnterFaceShell } from './js/nw-enterface-shell.mjs';
+    applyShoreBrand({ page: 'generic' });
     import { mountEnterFaceLawPanel } from './js/nw-enterface-attributes.mjs?v=19';
     registerEnterFaceShell();
     mountEnterFaceLawPanel(document.getElementById('unpack-law-panel'));
