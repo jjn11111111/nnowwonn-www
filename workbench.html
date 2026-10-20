@@ -682,6 +682,12 @@
         syncLaneUi();
       }
     }
+    if (params.get('from') === 'anti-venom' || params.get('from') === 'venom-symbiote') {
+      document.getElementById('perfect-storm-banner')?.removeAttribute('hidden');
+      const holdLane = laneRadios.find((r) => r.value === 'hold');
+      if (holdLane) holdLane.checked = true;
+      syncLaneUi();
+    }
     if (params.get('from') === 'perfect-storm' || params.get('install') === '1') {
       document.getElementById('perfect-storm-banner')?.removeAttribute('hidden');
       const holdLane = laneRadios.find((r) => r.value === 'hold');
